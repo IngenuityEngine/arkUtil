@@ -1,4 +1,3 @@
-util
-====
+## ieUtil
 
-Simple utility library for python
+Common utility functions for Python
