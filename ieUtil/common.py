@@ -64,7 +64,14 @@ def getArgs(args=None):
 		i += 2
 	return options
 
-def getJSONOptions(options, debug=True):
+'''
+	Method: parseJSON
+
+	Parses given JSON if possible.  If val is a dict, return val.
+	If val is a string that can't be parsed, return None.
+	If val is not dictionary or string, return {}.
+'''
+def parseJSON(options, debug=True):
 	if not options:
 		return {}
 	if varType(options) == 'dict':
@@ -80,6 +87,11 @@ def getJSONOptions(options, debug=True):
 def uriReplace(v):
   return v.replace('%','%25')
 
+'''
+	Method: postString
+
+	Formats args object for a post request.
+'''
 def postString(args):
   data = ''
   for k,v in args.iteritems():
@@ -93,7 +105,11 @@ def dictToAndFrom(val):
 		for k,v in val.iteritems():
 			invDict[v] = k
 		return dict(val.items() + invDict.items())
+'''
+	Method: mergeDict
 
+	Merges the items of two dictionaries.
+'''
 def mergeDict(a,b):
 	return dict(a.items() + b.items())
 
@@ -254,3 +270,101 @@ def ensureNumber(val):
 		return float(val)
 	except:
 		return 0
+
+'''
+	Method: omitObjectKeys
+
+	Given a dictionary, returns a dictionary with all entries with keys in keysToOmit omitted.
+'''
+def omitObjectKeys(d, keysToOmit):
+	keysToOmit = ensureArray(keysToOmit)
+	dictToReturn = {}
+	for k, v in d.iteritems():
+		if k not in keysToOmit:
+			dictToReturn[k] = v
+	return dictToReturn
+
+'''
+	Method: collectObjectKeys
+
+	Given a dictionary, returns a dictionary with all entries with keys in keysToKeep.
+'''
+def collectObjectKeys(d, keysToKeep):
+	keysToKeep = ensureArray(keysToKeep)
+	dictToReturn = {}
+	for k, v in d.iteritems():
+		if k in keysToKeep:
+			dictToReturn[k] = v
+	return dictToReturn
+
+'''
+	Method: parseInt
+
+	Behaves like javascripts parseInt.  Returns 0 if not a number.
+'''
+def parseInt(val):
+  m = re.search(r'^(\d+)[.,]?\d*?', str(val))
+  intToReturn = int(m.groups()[-1]) if m and not callable(val) else None
+  if (intToReturn):
+  	return intToReturn
+  return 0
+
+'''
+	Method: capitalize
+
+	Capitalizes first character in the given string.
+'''
+def capitalize(str):
+	if (str):
+		return str[0].upper() + str[1:]
+	else:
+		return ''
+
+'''
+	Method: capitalizeWords
+
+	Capitalizes the first character in each word.
+'''
+def capitalizeWords(str):
+	return ' '.join([capitalize(w) for w in str.split(' ')])
+
+'''
+	Method: parseSort
+
+	Accepts sorts in form 'field:ASC', 'field:-1', or 'field','desc'
+	Returns sort object.
+'''
+def parseSort(field, order):
+	parts = field.split(':')
+	if len(parts) > 1:
+		order = parts[1]
+	else:
+		order = order
+	order = str(order).lower().strip()[0]
+	if (order == 'd' or order == '-'):
+		order = 'DSC'
+	else:
+		order = 'ASC'
+	return {'field': parts[0], 'order': order, 'combined': parts[0] + ':' + order}
+
+'''
+	Method: stringCompare
+
+	Returns -1 if b > a, 1 if a > b, and 0 if a == b.
+'''
+def stringCompare(a, b):
+	a = a.lower()
+	b = b.lower()
+	if (b > a):
+		return -1
+	elif (a > b):
+		return 1
+	return 0
+
+'''
+	Method: getAlphaNumericOnly
+
+	Removes all non-alphanumeric values from a string.
+'''
+def getAlphaNumericOnly(val):
+	return ''.join([i for i in val if i.isalpha() or i.isdigit()])
