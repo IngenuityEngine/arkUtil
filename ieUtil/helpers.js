@@ -4,6 +4,7 @@
 var _ = require('lodash')
 var debug = require('debug')
 debug = debug('helpers')
+var crypto = require('crypto')
 
 // Our Modules
 /////////////////////////
@@ -20,6 +21,88 @@ isServer: typeof window == 'undefined',
 
 // Methods
 /////////////////////////
+
+/*
+	Method:  pad
+
+	Pads a number, <num> with zeros so the resulting string is <padding> digits long.
+*/
+pad: function(num, padding)
+{
+	while (num.length < padding)
+		num = '0' + num
+	return num
+},
+
+/*
+	Method: varType
+
+	Returns variable type of value passed in.
+*/
+varType: function(val)
+{
+	return ({}).toString.call(val).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+},
+
+/*
+	Method: utcTime
+
+	Return current UTC time.
+*/
+utcTime: function()
+{
+	var d = new Date()
+	return d.getTime() + d.getTimezoneOffset() + d.getTime()
+},
+
+/*
+	Method: randomHash
+
+	Returns random sha224 hash of given length.  Defaults to 16.
+*/
+randomHash: function(length)
+{
+	length = typeof length !== 'undefined' ? length : 16
+	return crypto.createHash('sha224').update(crypto.randomBytes(10).toString()).digest('hex').substr(0, length)
+
+},
+
+/*
+	Method: makeArrayUnique
+
+	Returns given array with all unique elements.
+*/
+makeArrayUnique: function(val)
+{
+	return val.filter(function(value, index, self) {return self.indexOf(value) === index;})
+},
+
+/*
+	Method: safeFilename
+
+	Removes unsafe characters from file names.
+*/
+safeFilename: function(filename)
+{
+	var nameToReturn = ''
+	var validChars = '-_.()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+	for (var i = 0; i < filename.length; i++)
+	{
+		if (validChars.indexOf(filename.charAt(i)) > -1)
+			nameToReturn = nameToReturn + filename.charAt(i)
+	}
+	return nameToReturn
+},
+
+/*
+	Method: movieSafeDim
+
+	Rounds number DOWN to the nearest multiple of 4.
+*/
+movieSafeDim: function(dim)
+{
+	return  parseInt(parseInt(dim, 10) * 0.25, 10) * 4
+},
 // fix: should be able to make these generic
 // and just do clientOnly but arguments magic variable
 // doesn't seem to work reliably with tests
@@ -52,6 +135,13 @@ collectRegexMatches: function(str, regex)
 	while (match !== null);
 	return matches
 },
+
+/*
+	Method: makeWebSafe
+
+	Takes a string and converts all non-alphanumeric characters to underscores.
+	Makes all characters lowercase.
+*/
 makeWebSafe: function(str)
 {
 	if (!_.isString(str))
@@ -89,12 +179,22 @@ checkDone: function(remaining, callback, err)
 	}
 	return remaining
 },
+/*
+	Method: getExtensions
+
+	Returns file extension all lowercase, with no whitespace.
+*/
 getExtension: function(filename)
 {
 	if (!_.contains(filename, '.'))
 		return ''
 	return '.' + filename.split('.').pop().toLowerCase().trim()
 },
+/*
+	Method: normalizeExtension
+
+	Returns file extension all lowercase with no whitespace, preceded by a period.
+*/
 normalizeExtension: function(extension)
 {
 	extension = extension.toLowerCase().trim()
@@ -102,6 +202,11 @@ normalizeExtension: function(extension)
 		return '.' + extension
 	return extension
 },
+/*
+	Method: removeExtension
+
+	Removes extension from filename.
+*/
 removeExtension: function(filename)
 {
 	// no toLowerCase otherwise .JPG isn't removed properly
@@ -109,9 +214,11 @@ removeExtension: function(filename)
 	return filename.replace(ext, '')
 },
 
-// Method: ensureExtension
-// Ensures a filename has a given extension
-// ex: test.this would become test.this.jpg
+/*
+	Method: ensureExtension
+
+	Checks that a given file has the given extension.  If not, appends the extension.
+*/
 ensureExtension: function(filename, extension)
 {
 	extension = helpers.normalizeExtension(extension)
@@ -119,8 +226,12 @@ ensureExtension: function(filename, extension)
 		return filename + extension
 	return filename
 },
-// Method: parseCommaArray
-// Turns 'likes, comments' into ['likes', 'comments']
+
+/*
+	Method: parseCommaArray
+
+	Turns 'likes, comments' into ['like', 'comments']
+*/
 parseCommaArray: function(val)
 {
 	// if (!_.isString(val))
@@ -129,6 +240,13 @@ parseCommaArray: function(val)
 	// trim each key
 	return keys.map(function(s) { return s.trim() })
 },
+/*
+	Method: appendOrSetArray
+
+	Appends val to obj if obj is an array.
+	If obj is not, and val is not null, returns val as an array.
+	If val is null, returns [].
+*/
 appendOrSetArray: function(obj, val)
 {
 	if (_.isArray(obj))
@@ -140,6 +258,12 @@ appendOrSetArray: function(obj, val)
 	else
 		return []
 },
+/*
+	Method: ensureArray
+
+	Returns val as an array.
+	If val is null, returns [].
+*/
 ensureArray: function(val)
 {
 	if (_.isArray(val))
@@ -148,6 +272,12 @@ ensureArray: function(val)
 		return []
 	return [val]
 },
+/*
+	Method: ensureNumber
+
+	Returns int version of val if val is int or a string representing a int.
+	Otherwise returns 0.
+*/
 ensureNumber: function(val)
 {
 	val = parseFloat(val)
