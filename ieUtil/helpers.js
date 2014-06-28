@@ -2,8 +2,8 @@
 // Vendor Modules
 /////////////////////////
 var _ = require('lodash')
-var debug = require('debug')
-debug = debug('helpers')
+// var debug = require('debug')
+// debug = debug('helpers')
 var crypto = require('crypto')
 
 // Our Modules
@@ -29,6 +29,7 @@ isServer: typeof window == 'undefined',
 */
 pad: function(num, padding)
 {
+	num = String(num)
 	while (num.length < padding)
 		num = '0' + num
 	return num
@@ -86,10 +87,10 @@ safeFilename: function(filename)
 {
 	var nameToReturn = ''
 	var validChars = '-_.()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-	for (var i = 0; i < filename.length; i++)
+	for (var i = 0; i < filename.length; i += 1)
 	{
-		if (validChars.indexOf(filename.charAt(i)) > -1)
-			nameToReturn = nameToReturn + filename.charAt(i)
+		if (validChars.indexOf(filename[i]) > -1)
+			nameToReturn = nameToReturn + filename[i]
 	}
 	return nameToReturn
 },
@@ -122,6 +123,7 @@ serverTest: function(func)
 			func(description, callback)
 	}
 },
+// Method: collectRegexMatches
 // collect all the matches in a string for a given regex object
 collectRegexMatches: function(str, regex)
 {
@@ -156,12 +158,51 @@ makeWebSafe: function(str)
 	// str = str.replace(/\_$/, '')
 	return str.toLowerCase()
 },
+/*
+	Method: postString
+
+	Formats args object for a post request.
+*/
+postString: function(args)
+{
+	var data = ''
+	for (var propt in args)
+	{
+		if (args.hasOwnProperty(propt))
+		{
+			data = data + String(propt) + '=' + String(args[propt]) + '&'
+		}
+	}
+	return data.slice(0, -1)
+},
+/*
+	Method: mergeObject
+
+	Merges the items of two objects.
+*/
+mergeObject: function(a, b)
+{
+	var c = {}
+	for (var attrname in a) {c[attrname] = a[attrname]}
+	for (attrname in b) {c[attrname] = b[attrname]}
+	return c
+},
+/*
+	Method: defaultFor
+
+	Returns defaultValue is variable is undefined.
+*/
 defaultFor: function(variable, defaultValue)
 {
 	if (typeof variable === 'undefined')
 		return defaultValue
 	return variable
 },
+/*
+	Method: checkDone
+
+	Performs callback is remaining >= 0.
+*/
 checkDone: function(remaining, callback, err)
 {
 	if (!_.isNumber(remaining))
@@ -230,7 +271,7 @@ ensureExtension: function(filename, extension)
 /*
 	Method: parseCommaArray
 
-	Turns 'likes, comments' into ['like', 'comments']
+	Turns 'like, comments' into ['like', 'comments']
 */
 parseCommaArray: function(val)
 {
@@ -285,22 +326,38 @@ ensureNumber: function(val)
 		return 0
 	return val
 },
+/*
+	Method: omitObjectKeys
+
+	Given a dictionary, returns a dictionary with all entries with keys in keysToOmit omitted.
+*/
 omitObjectKeys: function(object, keysToOmit)
 {
 	keysToOmit = helpers.ensureArray(keysToOmit)
 	return _.pick(object, function(val, key)
 		{
-			return !_.contains(keysToOmit, key)
+			return (!_.contains(keysToOmit, helpers.parseInt(key)))
 		})
 },
+/*
+	Method: collectObjectKeys
+
+	Given a dictionary, returns a dictionary with all entries with keys in keysToKeep.
+*/
 collectObjectKeys: function(object, keysToKeep)
 {
 	keysToKeep = helpers.ensureArray(keysToKeep)
 	return _.pick(object, function(val, key)
 		{
-			return _.contains(keysToKeep, key)
+			return _.contains(keysToKeep, helpers.parseInt(key))
 		})
 },
+/*	Method: parseJSON
+
+	Parses given JSON if possible.  If val is a dict, return val.
+	If val is a string that can't be parsed, return None.
+	If val is not dictionary or string, return val.
+*/
 // fix: define how this should work and use consistently
 parseJSON: function(val)
 {
@@ -318,6 +375,12 @@ parseJSON: function(val)
 	}
 	return val
 },
+/*
+	Method: parseSort
+
+	Accepts sorts in form 'field:ASC', 'field:-1', or 'field','desc'
+	Returns sort object.
+*/
 parseSort: function(field, order)
 {
 	var parts = field.split(':')
@@ -336,11 +399,17 @@ parseSort: function(field, order)
 		combined: parts[0] + ':' + order
 	}
 },
+/*
+	Method: parseInt
+
+	Behaves like javascripts parseInt.  Returns 0 if not a number.
+*/
 parseInt: function(val)
 {
 	return parseInt(val, 10) || 0
 },
 // stop an event from bubbling up
+/* MOVE OUT */
 stopBubble: function(e)
 {
 	if (!e)
@@ -352,10 +421,20 @@ stopBubble: function(e)
 	else
 		e.cancelBubble = true
 },
+/*
+	Method: capitalize
+
+	Capitalizes first character in the given string.
+*/
 capitalize: function(str)
 {
 	return str.charAt(0).toUpperCase() + str.slice(1)
 },
+/*
+	Method: capitalizeWords
+
+	Capitalizes the first character in each word.
+*/
 capitalizeWords: function(str)
 {
 	// http://kevin.vanzonneveld.net
@@ -373,6 +452,7 @@ capitalizeWords: function(str)
 		return $1.toUpperCase()
 	})
 },
+/* MOVE OUT */
 parseQueryString: function(queryString)
 {
 	if (!_.isString(queryString))
@@ -395,22 +475,31 @@ parseQueryString: function(queryString)
 		})
 	return params
 },
+/* MOVE OUT */
 isJQuery: function(obj)
 {
 	if (!helpers.jQuery)
 		return false
 	return obj instanceof helpers.jQuery
 },
+/* MOVE OUT */
 isJQueryEvent: function(obj)
 {
 	if (!helpers.jQuery)
 		return false
 	return obj instanceof helpers.jQuery.Event
 },
+/* DELETE? */
 isError: function(obj)
 {
 	return obj instanceof Error
 },
+
+/*
+	Method: getGlobal
+
+	Gets a global given a key.
+*/
 getGlobal: function(key)
 {
 	if (!_.isUndefined(global))
@@ -419,6 +508,11 @@ getGlobal: function(key)
 		return window[key]
 	return undefined
 },
+/*
+	Method: setGlobal
+
+	Sets a global given a key/value pair.
+*/
 setGlobal: function(key, val)
 {
 	if (!_.isUndefined(global))
@@ -426,16 +520,17 @@ setGlobal: function(key, val)
 	else if (!_.isUndefined(window))
 		window[key] = val
 },
-createHash: function(length)
-{
-	return Math.random().toString(36).substring(length)
-},
 callbackError: function(err, callback)
 {
 	if (callback)
 		callback(err)
 	return err
 },
+/*
+	Method: stringCompare
+
+	Returns -1 if b > a, 1 if a > b, and 0 if a == b.
+*/
 stringCompare: function(valA, valB, localeCompare)
 {
 	if (localeCompare)
@@ -466,11 +561,17 @@ nodeStyleCallback: function(options)
 	return options || {}
 },
 
+/* MOVE OUT */
 setDataAndAttribute: function(elem, key, val)
 {
 	elem.data(key, val).attr('data-' + key, val)
 },
 
+/*
+	Method: joinURL
+
+	Combines all string arguments to function.
+*/
 // fix: check for starting and trailing slashes
 joinURL: function()
 {
@@ -484,7 +585,13 @@ joinURL: function()
 	})
 	return combined
 },
-_notAlphaNumeric: new RegExp(/[^a-z0-9_]/g),
+
+/*
+	Method: getAlphaNumericOnly
+
+	Removes all non-alphanumeric characters from a string.
+*/
+_notAlphaNumeric: new RegExp(/[^a-zA-Z0-9_]/g),
 getAlphaNumericOnly: function(val)
 {
 	return val.replace(helpers._notAlphaNumeric, '')

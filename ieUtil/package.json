@@ -1,0 +1,36 @@
+{
+  "name": "coren",
+  "description": "Simple schema management and display via REST",
+  "version": "0.0.1",
+  "private": true,
+  "author": {
+    "name": "Grant Miller",
+    "email": "blented@gmail.com"
+  },
+  "main": "./server/cli",
+  "scripts": {
+    "prepublish": "npm prune",
+    "start": "coren -s",
+    "test": "mocha test/test-corenServer.js -b"
+  },
+  "dependencies": {
+    "lodash": "^2.4.1"
+  },
+  "bin": {
+  },
+  "keywords": [
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IngenuityEngine/coren.git"
+  },
+  "bugs": {
+    "url": "http://github.com/owner/coren/issues",
+    "email": "blented@gmail.com"
+  },
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.1.x"
+  },
+  "readmeFilename": "README.md"
+}
