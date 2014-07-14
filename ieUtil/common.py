@@ -131,6 +131,38 @@ def safeFilename(filename):
 	validChars = '-_.()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 	return ''.join(c for c in filename if c in validChars)
 
+REPLACEVARS = {
+'#37;':'%',
+'#38;':'&',
+'#92;':'\\'
+}
+
+'''
+	Method defaultStringInsert
+
+	Replaces a set of common SQL variables with "safe" versions
+'''
+def defaultStringInsert(str):
+	try:
+		for k,v in REPLACEVARS.items():
+			str = str.replace(v,k)
+	except:
+		pass
+	return str
+
+'''
+	Method defaultStringReplace
+
+	Resets a set of common SQL variables from their "safe" versions
+'''
+def defaultStringReplace(str):
+	try:
+		for k,v in REPLACEVARS.items():
+			str = str.replace(k,v)
+	except:
+		pass
+	return str
+
 '''
 	Method utcNow
 
