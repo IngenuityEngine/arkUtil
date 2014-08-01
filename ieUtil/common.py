@@ -53,6 +53,14 @@ def varType(val):
 # 		pass
 # 	return str
 
+def defaultStringReplace(str):
+	try:
+		for k,v in REPLACEVARS.items():
+			str = str.replace(k,v)
+	except:
+		pass
+	return str
+
 # fix: breaks on single dash arguments, improve
 def getArgs(args=None):
 	i = 1
