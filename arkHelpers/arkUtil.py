@@ -4,6 +4,7 @@ import time
 import random
 import hashlib
 import json
+import math
 
 # only need to do this once
 random.seed(time.time())
@@ -24,6 +25,13 @@ def pad(num,padding):
 	num = str(num)
 	return '0'*(padding-len(num)) + num
 
+'''
+	Method: clamp
+
+	given a num, a min, and a max, ensures an output within that range.
+'''
+def clamp(num, mininum, maximum):
+	return min(max(num, minimum), maximum)
 
 '''
 	Method: varType
@@ -52,6 +60,14 @@ def varType(val):
 # 	except:
 # 		pass
 # 	return str
+
+def defaultStringReplace(str):
+	try:
+		for k,v in REPLACEVARS.items():
+			str = str.replace(k,v)
+	except:
+		pass
+	return str
 
 # fix: breaks on single dash arguments, improve
 def getArgs(args=None):
@@ -130,12 +146,6 @@ def safeFilename(filename):
 	"""Return a filename with only file safe characters"""
 	validChars = '-_.()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 	return ''.join(c for c in filename if c in validChars)
-
-REPLACEVARS = {
-'#37;':'%',
-'#38;':'&',
-'#92;':'\\'
-}
 
 '''
 	Method defaultStringInsert
@@ -346,9 +356,9 @@ def parseInt(val):
 
 	Capitalizes first character in the given string.
 '''
-def capitalize(str):
-	if (str):
-		return str[0].upper() + str[1:]
+def capitalize(string):
+	if (string):
+		return string[0].upper() + string[1:]
 	else:
 		return ''
 
@@ -357,8 +367,26 @@ def capitalize(str):
 
 	Capitalizes the first character in each word.
 '''
-def capitalizeWords(str):
-	return ' '.join([capitalize(w) for w in str.split(' ')])
+def capitalizeWords(string):
+	return ' '.join([capitalize(w) for w in string.split(' ')])
+
+'''
+	Method: formalName
+
+	returns a capitalized version of the words
+'''
+def formalName(name):
+	formalName = name
+	firstChar = name[0]
+	if (firstChar == '_'):
+		formalName = formalName[1:]
+
+	formalName = capitalizeWords(formalName)
+
+	if (firstChar == '_'):
+		formalName = firstChar + formalName
+
+	return formalName
 
 '''
 	Method: parseSort
@@ -400,3 +428,25 @@ def stringCompare(a, b):
 '''
 def getAlphaNumericOnly(val):
 	return ''.join([i for i in val if i.isalpha() or i.isdigit()])
+
+'''
+	Method:removeTrailingSlash
+
+	Ensures a trailing slash is omitted
+'''
+def removeTrailingSlash(url):
+	if url[-1] == '/':
+		return url[:-1]
+	return url
+
+'''
+	Method: getRandomInteger
+
+	A wrapper around Python's random - ensures parity with helpers.js
+'''
+def getRandomInteger(minimum, maximum):
+	return random.randint(minimum, maximum)
+
+'''e
+	Method: getRandomFloat
+'''

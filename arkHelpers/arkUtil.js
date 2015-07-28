@@ -2,13 +2,15 @@
 // Vendor Modules
 /////////////////////////
 var _ = require('lodash')
-// var debug = require('debug')
-// debug = debug('helpers')
+var _s = require('underscore.string')
+var debug = require('debug')
+debug = debug('helpers')
 var crypto = require('crypto')
 
 // Our Modules
 /////////////////////////
 // var constants = require('../constants')
+var seed = 156
 
 // Main
 /////////////////////////
@@ -68,6 +70,48 @@ randomHash: function(length)
 
 },
 
+createHash: function(length)
+{
+	return Math.random().toString(36).substring(length)
+},
+
+// Method: random
+// Returns a random float between 0 and 1.  Slight bias towards 0 and 1.
+random: function()
+{
+	seed += 1
+	var x = Math.sin(seed) * 10000;
+	return x - Math.floor(x);
+},
+
+// Method: getRandomInteger
+// Returns a random integer between min and max inclusive.
+getRandomInteger: function(min, max)
+{
+	return Math.floor(helpers.random() * (max - min + 1)) + min
+},
+
+// Method: getRandomFloat
+// Returns a random float between min and max exclusive.
+getRandomFloat: function(min, max)
+{
+	return helpers.random() * (max - min) + min
+},
+
+// Method: getRandomIndex
+// Returns a random index number for a given array
+getRandomIndex: function(arr)
+{
+	return Math.floor(helpers.random() * arr.length)
+},
+
+// Method: getRandomIndexValue
+// Returns a random index value for a given array
+getRandomIndexValue: function(arr)
+{
+	return arr[helpers.getRandomIndex(arr)]
+},
+
 /*
 	Method: makeArrayUnique
 
@@ -123,6 +167,31 @@ serverTest: function(func)
 			func(description, callback)
 	}
 },
+
+loadLazyImages: function()
+{
+	var lazyImages = document.getElementsByTagName('img')
+	for (var i=0; i<lazyImages.length; i+=1)
+	{
+		if (lazyImages[i].getAttribute('data-src'))
+			lazyImages[i].setAttribute('src', lazyImages[i].getAttribute('data-src'))
+	}
+},
+
+clamp: function(num, min, max)
+{
+  return Math.min(Math.max(num, min), max)
+},
+
+getSiteRoot: function(coren)
+{
+	if (helpers.isClient)
+		return location.origin
+	else if (coren)
+		return 'http://127.0.0.1:' + coren.options.basics.port
+	return 'http://127.0.0.1'
+},
+
 // Method: collectRegexMatches
 // collect all the matches in a string for a given regex object
 collectRegexMatches: function(str, regex)
@@ -266,6 +335,63 @@ ensureExtension: function(filename, extension)
 	if (helpers.getExtension(filename) != extension)
 		return filename + extension
 	return filename
+},
+
+removeTrailingSlash: function(url)
+{
+	// remove trailing slashes
+	if (url[url.length-1] == '/')
+		return url.slice(0,-1)
+	return url
+},
+
+// Method: removeClass
+// Removes a class from a space-seprated class list
+removeClass: function(classes, classToRemove)
+{
+	if (!classes)
+		return ''
+	var newClasses = _.without(classes.split(' '), classToRemove)
+	if (!newClasses.length)
+		return ''
+	else if (newClasses.length == 1)
+		return newClasses[0]
+	return newClasses.join(' ')
+},
+// Method: addClass
+// Adds a class to a space-seprated class list
+addClass: function(spaceList, item)
+{
+	// if there's no existing list
+	// just return the item to add
+	if (!spaceList || !spaceList.length)
+	{
+		return item || ''
+	}
+	// if there's nothing to add,
+	// just return the original list
+	if (!item || !item.length)
+		return spaceList
+	return spaceList + ' ' + item
+},
+
+// helper for printing comma seperated in logic-less
+// template languages
+setLastArray: function(arr)
+{
+	if (_.isObject(arr[arr.length-1]) &&
+		!_.has(arr[arr.length-1], 'last'))
+		arr[arr.length-1].last = true
+	return arr
+},
+moveArrayItem: function(arr, from, to)
+{
+	if (from < 0)
+		from = arr.length + from
+	var element = arr[from]
+	arr.splice(from, 1)
+	arr.splice(to, 0, element)
+	return arr
 },
 
 /*
@@ -452,6 +578,28 @@ capitalizeWords: function(str)
 		return $1.toUpperCase()
 	})
 },
+
+formalName: function(name)
+{
+	if (!_.isString(name))
+		throw new Error('helpers.formalName -> ' +
+			'name is not a string: ' + name)
+
+	var formalName = name
+	var firstChar = name[0]
+	// slice off the 1st character
+	if (firstChar == '_')
+		formalName = formalName.slice(1)
+
+	formalName = _s.humanize(formalName)
+	formalName = helpers.capitalizeWords(formalName)
+
+	// add it back on
+	if (firstChar == '_')
+		formalName = firstChar + formalName
+	return formalName
+},
+
 /* MOVE OUT */
 parseQueryString: function(queryString)
 {
@@ -567,6 +715,16 @@ setDataAndAttribute: function(elem, key, val)
 	elem.data(key, val).attr('data-' + key, val)
 },
 
+removeDataAndAttribute: function(elem, key)
+{
+	elem.removeData(key).attr('data-' + key)
+},
+
+replaceAll: function(str, find, replace)
+{
+	return str.replace(new RegExp(find, 'g'), replace)
+},
+
 /*
 	Method: joinURL
 
@@ -595,6 +753,99 @@ _notAlphaNumeric: new RegExp(/[^a-zA-Z0-9_]/g),
 getAlphaNumericOnly: function(val)
 {
 	return val.replace(helpers._notAlphaNumeric, '')
+},
+
+// Method: getCSS
+// Gets the full css for a given jquery element
+getCSS: function(elem)
+{
+	var sheets = document.styleSheets
+	var cssObject = {}
+	var r
+
+	function CSSToJSON(css)
+	{
+		var s = {}
+		var i
+		if (!css) return s
+		if (typeof css == 'string')
+		{
+			css = css.split(' ')
+			for (i in css)
+			{
+				var l = css[i].split(': ')
+				s[l[0].toLowerCase()] = (l[1])
+			}
+		}
+		else
+		{
+			for (i in css)
+			{
+				if ((css[i]).toLowerCase)
+				{
+					s[(css[i]).toLowerCase()] = (css[css[i]])
+				}
+			}
+		}
+		return s
+	}
+
+	for (var i in sheets)
+	{
+		var rules = sheets[i].rules || sheets[i].cssRules
+		for (r in rules)
+		{
+			if (elem.is(rules[r].selectorText))
+			{
+				cssObject = _.extend(cssObject, CSSToJSON(rules[r].style), CSSToJSON(elem.attr('style')))
+			}
+		}
+	}
+	return cssObject
+},
+
+copyCSS: function(clone, original)
+{
+	var children
+	for (var i = 0; i < original.length; i += 1)
+	{
+		clone.eq(i).css(helpers.getCSS(original.eq(i)))
+		children = clone.eq(i).children()
+		if (children.length)
+			helpers.copyCSS(children, original.eq(i).children())
+	}
+},
+// Method: cloneWithCSS
+// Clone a jquery element with all it's css
+cloneWithCSS: function(elem, deep)
+{
+	var clone = elem.clone(deep)
+	helpers.copyCSS(clone, elem)
+	return clone
+},
+
+// Method: wrapWithEmptyParents
+// Wrap a jquery element with it's emptied parents
+// typically for the purpose of keeping CSS styles
+wrapWithEmptyParents: function(elem, parentSource, levelsToWrap, deep)
+{
+	var wrapper = parentSource.parent()
+	_.each(_.range(levelsToWrap), function()
+	{
+		elem.wrap(wrapper.clone(deep).empty())
+		elem = elem.parent()
+		wrapper = wrapper.parent()
+	})
+	return elem
+},
+
+// Method: cloneWithEmptyParents
+// Clone a jquery element with it's emptied parents
+// typically for the purpose of keeping CSS styles
+cloneWithEmptyParents: function(elem, levels, deep)
+{
+	return helpers
+		.wrapWithEmptyParents(elem.clone(deep), elem, levels, deep)
 },
 
 // end of module
