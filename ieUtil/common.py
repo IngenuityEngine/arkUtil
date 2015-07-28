@@ -60,7 +60,7 @@ def getArgs(args=None):
 		args = sys.argv
 	options = {'__file__':args[0]}
 	while (i < sys.argv.__len__() - 1):
-		options[args[i].replace('-','')] = args[i + 1]
+		options[re.sub('[^a-zA-Z_]', '', args[i])] = args[i + 1]
 		i += 2
 	return options
 
