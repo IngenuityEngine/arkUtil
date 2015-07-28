@@ -2,13 +2,15 @@
 // Vendor Modules
 /////////////////////////
 var _ = require('lodash')
-// var debug = require('debug')
-// debug = debug('helpers')
+var _s = require('underscore.string')
+var debug = require('debug')
+debug = debug('helpers')
 var crypto = require('crypto')
 
 // Our Modules
 /////////////////////////
 // var constants = require('../constants')
+var seed = 156
 
 // Main
 /////////////////////////

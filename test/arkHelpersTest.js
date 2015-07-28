@@ -8,7 +8,7 @@ describe('helpers', function() {
 	var helpers
 
 	it ('should load', function() {
-		helpers = require('../ieUtil/helpers.js')
+		helpers = require('../ieUtil/arkHelpers.js')
 	})
 
 	it ('should pad', function() {
