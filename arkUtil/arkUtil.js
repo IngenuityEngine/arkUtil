@@ -23,12 +23,6 @@ var helpers = module.exports = {
 isClient: clientTest,
 isServer: !clientTest,
 
-
-
-
-
-
-
 // Methods
 /////////////////////////
 // fix: should be able to make these generic
@@ -103,12 +97,6 @@ isSubset: function(test, all)
 {
 	return test.length === _.intersection(test, all).length
 },
-
-/*
-	Method:  pad
-
-	Pads a number, <num> with zeros so the resulting string is <padding> digits long.
-*/
 pad: function(num, padding, padChar)
 {
 	padChar = padChar || '0'
@@ -139,6 +127,125 @@ checkDone: function(remaining, callback, err)
 		return 0
 	}
 	return remaining
+},
+/*
+	Method: getExtensions
+
+	Returns file extension all lowercase, with no whitespace.
+*/
+getExtension: function(filename)
+{
+	if (!_.contains(filename, '.'))
+		return ''
+	return '.' + filename.split('.').pop().toLowerCase().trim()
+},
+/*
+	Method: normalizeExtension
+
+	Returns file extension all lowercase with no whitespace, preceded by a period.
+*/
+normalizeExtension: function(extension)
+{
+	extension = extension.toLowerCase().trim()
+	if (extension[0] != '.')
+		return '.' + extension
+	return extension
+},
+/*
+	Method: removeExtension
+
+	Removes extension from filename.
+*/
+removeExtension: function(filename)
+{
+	// no toLowerCase otherwise .JPG isn't removed properly
+	var ext = '.' + filename.split('.').pop().trim()
+	return filename.replace(ext, '')
+},
+removeTrailingSlash: function(url)
+{
+	// remove trailing slashes
+	if (url[url.length-1] == '/')
+		return url.slice(0,-1)
+	return url
+},
+// Method: removeClass
+// Removes a class from a space-seprated class list
+removeClass: function(classes, classToRemove)
+{
+	if (!classes)
+		return ''
+	var newClasses = _.without(classes.split(' '), classToRemove)
+	if (!newClasses.length)
+		return ''
+	else if (newClasses.length == 1)
+		return newClasses[0]
+	return newClasses.join(' ')
+},
+// Method: addClass
+// Adds a class to a space-seprated class list
+addClass: function(spaceList, item)
+{
+	// if there's no existing list
+	// just return the item to add
+	if (!spaceList || !spaceList.length)
+	{
+		return item || ''
+	}
+	// if there's nothing to add,
+	// just return the original list
+	if (!item || !item.length)
+		return spaceList
+	return spaceList + ' ' + item
+},
+
+// Method: getCSS
+// Gets the full css for a given jquery element
+getCSS: function(elem)
+{
+	var sheets = document.styleSheets
+	var cssObject = {}
+	var r
+
+	function CSSToJSON(css)
+	{
+		var s = {}
+		var i
+		if (!css) return s
+		if (typeof css == 'string')
+		{
+			css = css.split(' ')
+			for (i in css)
+			{
+				var l = css[i].split(': ')
+				s[l[0].toLowerCase()] = (l[1])
+			}
+		}
+		else
+		{
+			for (i in css)
+			{
+				if ((css[i]).toLowerCase)
+				{
+					s[(css[i]).toLowerCase()] = (css[css[i]])
+				}
+			}
+		}
+		return s
+	}
+
+	for (var i in sheets)
+	{
+		var rules = sheets[i].rules || sheets[i].cssRules
+		for (r in rules)
+		{
+			if (elem.is(rules[r].selectorText))
+			{
+				cssObject = _.extend(cssObject, CSSToJSON(rules[r].style), CSSToJSON(elem.attr('style')))
+			}
+		}
+	}
+	return cssObject
 },
 
 copyCSS: function(clone, original)
@@ -185,214 +292,6 @@ cloneWithEmptyParents: function(elem, levels, deep)
 		.wrapWithEmptyParents(elem.clone(deep), elem, levels, deep)
 },
 
-createHash: function(length)
-{
-	return Math.random().toString(36).substring(length)
-},
-
-// Method: getRandomInteger
-// Returns a random integer between min and max inclusive.
-getRandomInteger: function(min, max)
-{
-	return Math.floor(helpers.random() * (max - min + 1)) + min
-},
-
-// Method: getRandomFloat
-// Returns a random float between min and max exclusive.
-getRandomFloat: function(min, max)
-{
-	return helpers.random() * (max - min) + min
-},
-
-// Method: getRandomIndex
-// Returns a random index number for a given array
-getRandomIndex: function(arr)
-{
-	return Math.floor(helpers.random() * arr.length)
-},
-
-// Method: getRandomIndexValue
-// Returns a random index value for a given array
-getRandomIndexValue: function(arr)
-{
-	return arr[helpers.getRandomIndex(arr)]
-},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Methods
-/////////////////////////
-
-
-/*
-	Method: varType
-
-	Returns variable type of value passed in.
-*/
-varType: function(val)
-{
-	return ({}).toString.call(val).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
-},
-
-/*
-	Method: utcTime
-
-	Return current UTC time.
-*/
-utcTime: function()
-{
-	var d = new Date()
-	return d.getTime() + d.getTimezoneOffset() + d.getTime()
-},
-
-
-// Method: random
-// Returns a random float between 0 and 1.  Slight bias towards 0 and 1.
-random: function()
-{
-	seed += 1
-	var x = Math.sin(seed) * 10000;
-	return x - Math.floor(x);
-},
-
-
-/*
-	Method: makeArrayUnique
-
-	Returns given array with all unique elements.
-*/
-makeArrayUnique: function(val)
-{
-	return val.filter(function(value, index, self) {return self.indexOf(value) === index;})
-},
-
-/*
-	Method: safeFilename
-
-	Removes unsafe characters from file names.
-*/
-safeFilename: function(filename)
-{
-	var nameToReturn = ''
-	var validChars = '-_.()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-	for (var i = 0; i < filename.length; i += 1)
-	{
-		if (validChars.indexOf(filename[i]) > -1)
-			nameToReturn = nameToReturn + filename[i]
-	}
-	return nameToReturn
-},
-
-/*
-	Method: movieSafeDim
-
-	Rounds number DOWN to the nearest multiple of 4.
-*/
-movieSafeDim: function(dim)
-{
-	return  parseInt(parseInt(dim, 10) * 0.25, 10) * 4
-},
-
-/*
-	Method: postString
-
-	Formats args object for a post request.
-*/
-postString: function(args)
-{
-	var data = ''
-	for (var propt in args)
-	{
-		if (args.hasOwnProperty(propt))
-		{
-			data = data + String(propt) + '=' + String(args[propt]) + '&'
-		}
-	}
-	return data.slice(0, -1)
-},
-/*
-	Method: mergeObject
-
-	Merges the items of two objects.
-*/
-mergeObject: function(a, b)
-{
-	var c = {}
-	for (var attrname in a) {c[attrname] = a[attrname]}
-	for (attrname in b) {c[attrname] = b[attrname]}
-	return c
-},
-/*
-	Method: getExtensions
-
-	Returns file extension all lowercase, with no whitespace.
-*/
-getExtension: function(filename)
-{
-	if (!_.contains(filename, '.'))
-		return ''
-	return '.' + filename.split('.').pop().toLowerCase().trim()
-},
-/*
-	Method: normalizeExtension
-
-	Returns file extension all lowercase with no whitespace, preceded by a period.
-*/
-normalizeExtension: function(extension)
-{
-	extension = extension.toLowerCase().trim()
-	if (extension[0] != '.')
-		return '.' + extension
-	return extension
-},
-/*
-	Method: removeExtension
-
-	Removes extension from filename.
-*/
-removeExtension: function(filename)
-{
-	// no toLowerCase otherwise .JPG isn't removed properly
-	var ext = '.' + filename.split('.').pop().trim()
-	return filename.replace(ext, '')
-},
-
 /*
 	Method: ensureExtension
 
@@ -405,45 +304,6 @@ ensureExtension: function(filename, extension)
 		return filename + extension
 	return filename
 },
-
-removeTrailingSlash: function(url)
-{
-	// remove trailing slashes
-	if (url[url.length-1] == '/')
-		return url.slice(0,-1)
-	return url
-},
-
-// Method: removeClass
-// Removes a class from a space-seprated class list
-removeClass: function(classes, classToRemove)
-{
-	if (!classes)
-		return ''
-	var newClasses = _.without(classes.split(' '), classToRemove)
-	if (!newClasses.length)
-		return ''
-	else if (newClasses.length == 1)
-		return newClasses[0]
-	return newClasses.join(' ')
-},
-// Method: addClass
-// Adds a class to a space-seprated class list
-addClass: function(spaceList, item)
-{
-	// if there's no existing list
-	// just return the item to add
-	if (!spaceList || !spaceList.length)
-	{
-		return item || ''
-	}
-	// if there's nothing to add,
-	// just return the original list
-	if (!item || !item.length)
-		return spaceList
-	return spaceList + ' ' + item
-},
-
 // helper for printing comma seperated in logic-less
 // template languages
 setLastArray: function(arr)
@@ -462,7 +322,6 @@ moveArrayItem: function(arr, from, to)
 	arr.splice(to, 0, element)
 	return arr
 },
-
 /*
 	Method: parseCommaArray
 
@@ -531,7 +390,7 @@ omitObjectKeys: function(object, keysToOmit)
 	keysToOmit = helpers.ensureArray(keysToOmit)
 	return _.pick(object, function(val, key)
 		{
-			return (!_.contains(keysToOmit, helpers.parseInt(key)))
+			return !_.contains(keysToOmit, key)
 		})
 },
 /*
@@ -544,7 +403,7 @@ collectObjectKeys: function(object, keysToKeep)
 	keysToKeep = helpers.ensureArray(keysToKeep)
 	return _.pick(object, function(val, key)
 		{
-			return _.contains(keysToKeep, helpers.parseInt(key))
+			return _.contains(keysToKeep, key)
 		})
 },
 /*	Method: parseJSON
@@ -604,7 +463,6 @@ parseInt: function(val)
 	return parseInt(val, 10) || 0
 },
 // stop an event from bubbling up
-/* MOVE OUT */
 stopBubble: function(e)
 {
 	if (!e)
@@ -647,7 +505,6 @@ capitalizeWords: function(str)
 		return $1.toUpperCase()
 	})
 },
-
 formalName: function(name)
 {
 	if (!_.isString(name))
@@ -668,8 +525,6 @@ formalName: function(name)
 		formalName = firstChar + formalName
 	return formalName
 },
-
-/* MOVE OUT */
 parseQueryString: function(queryString)
 {
 	if (!_.isString(queryString))
@@ -692,26 +547,22 @@ parseQueryString: function(queryString)
 		})
 	return params
 },
-/* MOVE OUT */
 isJQuery: function(obj)
 {
 	if (!helpers.jQuery)
 		return false
 	return obj instanceof helpers.jQuery
 },
-/* MOVE OUT */
 isJQueryEvent: function(obj)
 {
 	if (!helpers.jQuery)
 		return false
 	return obj instanceof helpers.jQuery.Event
 },
-/* DELETE? */
 isError: function(obj)
 {
 	return obj instanceof Error
 },
-
 /*
 	Method: getGlobal
 
@@ -737,6 +588,47 @@ setGlobal: function(key, val)
 	else if (!_.isUndefined(window))
 		window[key] = val
 },
+createHash: function(length)
+{
+	return Math.random().toString(36).substring(length)
+},
+// Method: random
+// Returns a random float between 0 and 1.  Slight bias towards 0 and 1.
+random: function()
+{
+	seed += 1
+	var x = Math.sin(seed) * 10000;
+	return x - Math.floor(x);
+},
+
+// Method: getRandomInteger
+// Returns a random integer between min and max inclusive.
+getRandomInteger: function(min, max)
+{
+	return Math.floor(helpers.random() * (max - min + 1)) + min
+},
+
+// Method: getRandomFloat
+// Returns a random float between min and max exclusive.
+getRandomFloat: function(min, max)
+{
+	return helpers.random() * (max - min) + min
+},
+
+// Method: getRandomIndex
+// Returns a random index number for a given array
+getRandomIndex: function(arr)
+{
+	return Math.floor(helpers.random() * arr.length)
+},
+
+// Method: getRandomIndexValue
+// Returns a random index value for a given array
+getRandomIndexValue: function(arr)
+{
+	return arr[helpers.getRandomIndex(arr)]
+},
+
 callbackError: function(err, callback)
 {
 	if (callback)
@@ -778,17 +670,14 @@ nodeStyleCallback: function(options)
 	return options || {}
 },
 
-/* MOVE OUT */
 setDataAndAttribute: function(elem, key, val)
 {
 	elem.data(key, val).attr('data-' + key, val)
 },
-
 removeDataAndAttribute: function(elem, key)
 {
 	elem.removeData(key).attr('data-' + key)
 },
-
 replaceAll: function(str, find, replace)
 {
 	return str.replace(new RegExp(find, 'g'), replace)
@@ -818,60 +707,106 @@ joinURL: function()
 
 	Removes all non-alphanumeric characters from a string.
 */
-_notAlphaNumeric: new RegExp(/[^a-zA-Z0-9_]/g),
+_notAlphaNumeric: new RegExp(/[^a-z0-9_]/g),
 getAlphaNumericOnly: function(val)
 {
 	return val.replace(helpers._notAlphaNumeric, '')
 },
 
-// Method: getCSS
-// Gets the full css for a given jquery element
-getCSS: function(elem)
+
+// Methods
+/////////////////////////
+
+/*
+	Method: varType
+
+	Returns variable type of value passed in.
+*/
+varType: function(val)
 {
-	var sheets = document.styleSheets
-	var cssObject = {}
-	var r
-
-	function CSSToJSON(css)
-	{
-		var s = {}
-		var i
-		if (!css) return s
-		if (typeof css == 'string')
-		{
-			css = css.split(' ')
-			for (i in css)
-			{
-				var l = css[i].split(': ')
-				s[l[0].toLowerCase()] = (l[1])
-			}
-		}
-		else
-		{
-			for (i in css)
-			{
-				if ((css[i]).toLowerCase)
-				{
-					s[(css[i]).toLowerCase()] = (css[css[i]])
-				}
-			}
-		}
-		return s
-	}
-
-	for (var i in sheets)
-	{
-		var rules = sheets[i].rules || sheets[i].cssRules
-		for (r in rules)
-		{
-			if (elem.is(rules[r].selectorText))
-			{
-				cssObject = _.extend(cssObject, CSSToJSON(rules[r].style), CSSToJSON(elem.attr('style')))
-			}
-		}
-	}
-	return cssObject
+	return ({}).toString.call(val).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
 },
+
+/*
+	Method: utcTime
+
+	Return current UTC time.
+*/
+utcTime: function()
+{
+	var d = new Date()
+	return d.getTime() + d.getTimezoneOffset() + d.getTime()
+},
+
+
+
+/*
+	Method: makeArrayUnique
+
+	Returns given array with all unique elements.
+*/
+makeArrayUnique: function(val)
+{
+	return val.filter(function(value, index, self) {return self.indexOf(value) === index;})
+},
+
+/*
+	Method: safeFilename
+
+	Removes unsafe characters from file names.
+*/
+safeFilename: function(filename)
+{
+	var nameToReturn = ''
+	var validChars = '-_.()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+	for (var i = 0; i < filename.length; i += 1)
+	{
+		if (validChars.indexOf(filename[i]) > -1)
+			nameToReturn = nameToReturn + filename[i]
+	}
+	return nameToReturn
+},
+
+/*
+	Method: movieSafeDim
+
+	Rounds number DOWN to the nearest multiple of 4.
+*/
+movieSafeDim: function(dim)
+{
+	return  parseInt(parseInt(dim, 10) * 0.25, 10) * 4
+},
+
+/*
+	Method: postString
+
+	Formats args object for a post request.
+*/
+postString: function(args)
+{
+	var data = ''
+	for (var propt in args)
+	{
+		if (args.hasOwnProperty(propt))
+		{
+			data = data + String(propt) + '=' + String(args[propt]) + '&'
+		}
+	}
+	return data.slice(0, -1)
+},
+/*
+	Method: mergeObject
+
+	Merges the items of two objects.
+*/
+mergeObject: function(a, b)
+{
+	var c = {}
+	for (var attrname in a) {c[attrname] = a[attrname]}
+	for (attrname in b) {c[attrname] = b[attrname]}
+	return c
+},
+
 
 // end of module
 }
