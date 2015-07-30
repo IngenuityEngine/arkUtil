@@ -1,8 +1,7 @@
 {
-  "name": "arkUtil",
+  "name": "arkutil",
   "description": "Common utility functions for Python and Javascript",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.2",
   "author": {
     "name": "Grant Miller",
     "email": "blented@gmail.com"
@@ -25,8 +24,8 @@
     "email": "blented@gmail.com"
   },
   "engines": {
-    "node": "0.10.x",
-    "npm": "1.1.x"
+    "node": "*",
+    "npm": "*"
   },
   "readmeFilename": "README.md"
 }

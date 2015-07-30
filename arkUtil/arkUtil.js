@@ -5,12 +5,13 @@ var _ = require('lodash')
 var _s = require('underscore.string')
 var debug = require('debug')
 debug = debug('helpers')
-var crypto = require('crypto')
 
 // Our Modules
 /////////////////////////
 // var constants = require('../constants')
 var seed = 156
+var clientTest = (typeof process != 'undefined' && process.env.isClient) ||
+					(typeof window != 'undefined' && window.document)
 
 // Main
 /////////////////////////
@@ -18,70 +19,175 @@ var helpers = module.exports = {
 
 // Variables
 /////////////////////////
-isClient: typeof window != 'undefined' && window.document,
-isServer: typeof window == 'undefined',
+// fix: hax to run in client mode on the server
+isClient: clientTest,
+isServer: !clientTest,
+
+
+
+
+
+
 
 // Methods
 /////////////////////////
+// fix: should be able to make these generic
+// and just do clientOnly but arguments magic variable
+// doesn't seem to work reliably with tests
+clientTest: function(func)
+{
+	return function(description, callback)
+	{
+		if (helpers.isClient)
+			func(description, callback)
+	}
+},
+serverTest: function(func)
+{
+	return function(description, callback)
+	{
+		if (helpers.isServer)
+			func(description, callback)
+	}
+},
+loadLazyImages: function()
+{
+	var lazyImages = document.getElementsByTagName('img')
+	for (var i=0; i<lazyImages.length; i+=1)
+	{
+		if (lazyImages[i].getAttribute('data-src'))
+			lazyImages[i].setAttribute('src', lazyImages[i].getAttribute('data-src'))
+	}
+},
+clamp: function(num, min, max)
+{
+  return Math.min(Math.max(num, min), max)
+},
+getSiteRoot: function(coren)
+{
+	if (helpers.isClient)
+		return location.origin
+	else if (coren)
+		return 'http://127.0.0.1:' + coren.options.basics.port
+	return 'http://127.0.0.1'
+},
+// collect all the matches in a string for a given regex object
+// note: /g flag must be set on RegExp(regex, 'g') or /regex/g
+collectRegexMatches: function(str, regex)
+{
+	var matches = []
+	var match
+	do {
+		match = regex.exec(str)
+		if (match !== null)
+			matches.push(match)
+	}
+	while (match !== null)
+	return matches
+},
+makeWebSafe: function(str)
+{
+	if (!_.isString(str))
+		throw Error('helpers.webSafe requires a string')
+	// Everything not a letter or number becomes an underscore
+	str = str.replace(/[^A-Za-z0-9]/g, '_')
+	// Consecutive underscores become one dash
+	str = str.replace(/\_+/g, '_')
+	// Leading underscores go away
+	str = str.replace(/^\_/, '')
+	// Trailing underscores go away
+	str = str.replace(/\_$/, '')
+	return str.toLowerCase()
+},
+isSubset: function(test, all)
+{
+	return test.length === _.intersection(test, all).length
+},
 
 /*
 	Method:  pad
 
 	Pads a number, <num> with zeros so the resulting string is <padding> digits long.
 */
-pad: function(num, padding)
+pad: function(num, padding, padChar)
 {
-	num = String(num)
-	while (num.length < padding)
-		num = '0' + num
-	return num
+	padChar = padChar || '0'
+	num = num + ''
+	if (num.length >= padding)
+		return num
+	return new Array(padding - num.length + 1).join(padChar) + num
+},
+defaultFor: function(variable, defaultValue)
+{
+	if (typeof variable === 'undefined')
+		return defaultValue
+	return variable
+},
+checkDone: function(remaining, callback, err)
+{
+	if (!_.isNumber(remaining))
+		throw new Error('helpers.checkDone -> Invalid remaining')
+	if (err)
+	{
+		callback(err)
+		return 0
+	}
+	remaining -= 1
+	if (remaining <= 0)
+	{
+		callback(err)
+		return 0
+	}
+	return remaining
 },
 
-/*
-	Method: varType
-
-	Returns variable type of value passed in.
-*/
-varType: function(val)
+copyCSS: function(clone, original)
 {
-	return ({}).toString.call(val).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+	var children
+	for (var i = 0; i < original.length; i += 1)
+	{
+		clone.eq(i).css(helpers.getCSS(original.eq(i)))
+		children = clone.eq(i).children()
+		if (children.length)
+			helpers.copyCSS(children, original.eq(i).children())
+	}
+},
+// Method: cloneWithCSS
+// Clone a jquery element with all it's css
+cloneWithCSS: function(elem, deep)
+{
+	var clone = elem.clone(deep)
+	helpers.copyCSS(clone, elem)
+	return clone
 },
 
-/*
-	Method: utcTime
-
-	Return current UTC time.
-*/
-utcTime: function()
+// Method: wrapWithEmptyParents
+// Wrap a jquery element with it's emptied parents
+// typically for the purpose of keeping CSS styles
+wrapWithEmptyParents: function(elem, parentSource, levelsToWrap, deep)
 {
-	var d = new Date()
-	return d.getTime() + d.getTimezoneOffset() + d.getTime()
+	var wrapper = parentSource.parent()
+	_.each(_.range(levelsToWrap), function()
+	{
+		elem.wrap(wrapper.clone(deep).empty())
+		elem = elem.parent()
+		wrapper = wrapper.parent()
+	})
+	return elem
 },
 
-/*
-	Method: randomHash
-
-	Returns random sha224 hash of given length.  Defaults to 16.
-*/
-randomHash: function(length)
+// Method: cloneWithEmptyParents
+// Clone a jquery element with it's emptied parents
+// typically for the purpose of keeping CSS styles
+cloneWithEmptyParents: function(elem, levels, deep)
 {
-	length = typeof length !== 'undefined' ? length : 16
-	return crypto.createHash('sha224').update(crypto.randomBytes(10).toString()).digest('hex').substr(0, length)
-
+	return helpers
+		.wrapWithEmptyParents(elem.clone(deep), elem, levels, deep)
 },
 
 createHash: function(length)
 {
 	return Math.random().toString(36).substring(length)
-},
-
-// Method: random
-// Returns a random float between 0 and 1.  Slight bias towards 0 and 1.
-random: function()
-{
-	seed += 1
-	var x = Math.sin(seed) * 10000;
-	return x - Math.floor(x);
 },
 
 // Method: getRandomInteger
@@ -111,6 +217,80 @@ getRandomIndexValue: function(arr)
 {
 	return arr[helpers.getRandomIndex(arr)]
 },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Methods
+/////////////////////////
+
+
+/*
+	Method: varType
+
+	Returns variable type of value passed in.
+*/
+varType: function(val)
+{
+	return ({}).toString.call(val).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+},
+
+/*
+	Method: utcTime
+
+	Return current UTC time.
+*/
+utcTime: function()
+{
+	var d = new Date()
+	return d.getTime() + d.getTimezoneOffset() + d.getTime()
+},
+
+
+// Method: random
+// Returns a random float between 0 and 1.  Slight bias towards 0 and 1.
+random: function()
+{
+	seed += 1
+	var x = Math.sin(seed) * 10000;
+	return x - Math.floor(x);
+},
+
 
 /*
 	Method: makeArrayUnique
@@ -148,85 +328,7 @@ movieSafeDim: function(dim)
 {
 	return  parseInt(parseInt(dim, 10) * 0.25, 10) * 4
 },
-// fix: should be able to make these generic
-// and just do clientOnly but arguments magic variable
-// doesn't seem to work reliably with tests
-clientTest: function(func)
-{
-	return function(description, callback)
-	{
-		if (helpers.isClient)
-			func(description, callback)
-	}
-},
-serverTest: function(func)
-{
-	return function(description, callback)
-	{
-		if (helpers.isServer)
-			func(description, callback)
-	}
-},
 
-loadLazyImages: function()
-{
-	var lazyImages = document.getElementsByTagName('img')
-	for (var i=0; i<lazyImages.length; i+=1)
-	{
-		if (lazyImages[i].getAttribute('data-src'))
-			lazyImages[i].setAttribute('src', lazyImages[i].getAttribute('data-src'))
-	}
-},
-
-clamp: function(num, min, max)
-{
-  return Math.min(Math.max(num, min), max)
-},
-
-getSiteRoot: function(coren)
-{
-	if (helpers.isClient)
-		return location.origin
-	else if (coren)
-		return 'http://127.0.0.1:' + coren.options.basics.port
-	return 'http://127.0.0.1'
-},
-
-// Method: collectRegexMatches
-// collect all the matches in a string for a given regex object
-collectRegexMatches: function(str, regex)
-{
-	var matches = []
-	var match
-	do {
-		match = regex.exec(str)
-		if (match !== null)
-			matches.push(match)
-	}
-	while (match !== null);
-	return matches
-},
-
-/*
-	Method: makeWebSafe
-
-	Takes a string and converts all non-alphanumeric characters to underscores.
-	Makes all characters lowercase.
-*/
-makeWebSafe: function(str)
-{
-	if (!_.isString(str))
-		throw Error('helpers.webSafe requires a string')
-	// Everything not a letter or number becomes an underscore
-	str = str.replace(/[^A-Za-z0-9]/g, '_')
-	// Consecutive underscores become one dash
-	// str = str.replace(/\_+/g, '_')
-	// Leading underscores go away
-	// str = str.replace(/^\_/, '')
-	// Trailing underscores go away
-	// str = str.replace(/\_$/, '')
-	return str.toLowerCase()
-},
 /*
 	Method: postString
 
@@ -255,39 +357,6 @@ mergeObject: function(a, b)
 	for (var attrname in a) {c[attrname] = a[attrname]}
 	for (attrname in b) {c[attrname] = b[attrname]}
 	return c
-},
-/*
-	Method: defaultFor
-
-	Returns defaultValue is variable is undefined.
-*/
-defaultFor: function(variable, defaultValue)
-{
-	if (typeof variable === 'undefined')
-		return defaultValue
-	return variable
-},
-/*
-	Method: checkDone
-
-	Performs callback is remaining >= 0.
-*/
-checkDone: function(remaining, callback, err)
-{
-	if (!_.isNumber(remaining))
-		throw new Error('helpers.checkDone -> Invalid remaining')
-	if (err)
-	{
-		callback(err)
-		return 0
-	}
-	remaining -= 1
-	if (remaining <= 0)
-	{
-		callback(err)
-		return 0
-	}
-	return remaining
 },
 /*
 	Method: getExtensions
@@ -802,50 +871,6 @@ getCSS: function(elem)
 		}
 	}
 	return cssObject
-},
-
-copyCSS: function(clone, original)
-{
-	var children
-	for (var i = 0; i < original.length; i += 1)
-	{
-		clone.eq(i).css(helpers.getCSS(original.eq(i)))
-		children = clone.eq(i).children()
-		if (children.length)
-			helpers.copyCSS(children, original.eq(i).children())
-	}
-},
-// Method: cloneWithCSS
-// Clone a jquery element with all it's css
-cloneWithCSS: function(elem, deep)
-{
-	var clone = elem.clone(deep)
-	helpers.copyCSS(clone, elem)
-	return clone
-},
-
-// Method: wrapWithEmptyParents
-// Wrap a jquery element with it's emptied parents
-// typically for the purpose of keeping CSS styles
-wrapWithEmptyParents: function(elem, parentSource, levelsToWrap, deep)
-{
-	var wrapper = parentSource.parent()
-	_.each(_.range(levelsToWrap), function()
-	{
-		elem.wrap(wrapper.clone(deep).empty())
-		elem = elem.parent()
-		wrapper = wrapper.parent()
-	})
-	return elem
-},
-
-// Method: cloneWithEmptyParents
-// Clone a jquery element with it's emptied parents
-// typically for the purpose of keeping CSS styles
-cloneWithEmptyParents: function(elem, levels, deep)
-{
-	return helpers
-		.wrapWithEmptyParents(elem.clone(deep), elem, levels, deep)
 },
 
 // end of module
