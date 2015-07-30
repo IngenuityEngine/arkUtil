@@ -1,11 +1,12 @@
 {
   "name": "arkutil",
   "description": "Common utility functions for Python and Javascript",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": {
     "name": "Grant Miller",
     "email": "blented@gmail.com"
   },
+  "main": "./arkUtil/arkUtil.js",
   "dependencies": {
     "lodash": "^2.4.1",
     "debug": "*",
