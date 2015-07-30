@@ -1,3 +1,3 @@
-## ieUtil
+## arkUtil
 
-Common utility functions for Python
+Common utility functions for Python and Javascript
