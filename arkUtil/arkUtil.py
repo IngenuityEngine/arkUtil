@@ -1,10 +1,14 @@
+
+import os
 import sys
 import re
 import time
 import random
 import hashlib
 import json
-import math
+# import math
+from StringIO import StringIO
+import traceback
 
 # only need to do this once
 random.seed(time.time())
@@ -31,7 +35,7 @@ def pad(num,padding):
 	given a num, a min, and a max, ensures an output within that range.
 '''
 def clamp(num, mininum, maximum):
-	return min(max(num, minimum), maximum)
+	return min(max(num, mininum), maximum)
 
 '''
 	Method: varType
@@ -156,19 +160,6 @@ def defaultStringInsert(str):
 	try:
 		for k,v in REPLACEVARS.items():
 			str = str.replace(v,k)
-	except:
-		pass
-	return str
-
-'''
-	Method defaultStringReplace
-
-	Resets a set of common SQL variables from their "safe" versions
-'''
-def defaultStringReplace(str):
-	try:
-		for k,v in REPLACEVARS.items():
-			str = str.replace(k,v)
 	except:
 		pass
 	return str
@@ -447,6 +438,64 @@ def removeTrailingSlash(url):
 def getRandomInteger(minimum, maximum):
 	return random.randint(minimum, maximum)
 
-'''e
-	Method: getRandomFloat
 '''
+	Method: executePython
+
+	Execute python code
+'''
+def executePython(code, context={}):
+	# fix syntax error if last line is a comment with no new line
+	if not code.endswith('\n'):
+		code = code + '\n'
+
+	# compile
+	try:
+		scriptType = 'exec'
+		if code.count('\n') == 1:
+			scriptType = 'single'
+		compiled = compile(code, '<string>', scriptType)
+	except Exception:
+		return traceback.format_exc()
+
+	oldStdOut = sys.stdout
+
+	# override stdout to capture exec results
+	outBuffer = StringIO()
+	sys.stdout = outBuffer
+
+	try:
+		context.update(globals())
+		exec(compiled, context)
+	except Exception:
+		# remove refernces to this command and the calling scripteditor host
+		# script from the traceback output
+		formatted_lines = traceback.format_exc().splitlines()
+		formatted_lines.pop(2)
+		formatted_lines.pop(1)
+		result = '\n'.join(formatted_lines)
+	else:
+		result = outBuffer.getvalue()
+
+	sys.stdout = oldStdOut
+	return result
+
+'''
+	Method: executePythonFile
+
+	Execute a python file
+'''
+def executePythonFile(scriptPath, context={}):
+	try:
+		with open(scriptPath) as f:
+			code = f.read()
+	except Exception:
+		return traceback.format_exc()
+
+	# set expected python magic variables
+	context['__file__'] = scriptPath
+	context['__name__'] = '__main__'
+	sys.argv = [scriptPath]
+
+	# append the dirname to path so we can require files like normal
+	sys.path.append(os.path.dirname(scriptPath))
+	return executePython(code, context)
