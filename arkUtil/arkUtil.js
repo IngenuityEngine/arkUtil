@@ -333,7 +333,10 @@ parseCommaArray: function(val)
 	// 	throw new Error('helpers.parseCommaArray -> val must be a string, got:' + val)
 	var keys = val.split(',')
 	// trim each key
-	return keys.map(function(s) { return s.trim() })
+	return _.map(keys, function(s)
+		{
+			return s.trim()
+		})
 },
 /*
 	Method: appendOrSetArray
