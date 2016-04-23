@@ -135,7 +135,7 @@ checkDone: function(remaining, callback, err)
 */
 getExtension: function(filename)
 {
-	if (!_.contains(filename, '.'))
+	if (!_.includes(filename, '.'))
 		return ''
 	return '.' + filename.split('.').pop().toLowerCase().trim()
 },
@@ -333,10 +333,7 @@ parseCommaArray: function(val)
 	// 	throw new Error('helpers.parseCommaArray -> val must be a string, got:' + val)
 	var keys = val.split(',')
 	// trim each key
-	return _.map(keys, function(s)
-		{
-			return s.trim()
-		})
+	return keys.map(function(s) { return s.trim() })
 },
 /*
 	Method: appendOrSetArray
@@ -391,9 +388,9 @@ ensureNumber: function(val)
 omitObjectKeys: function(object, keysToOmit)
 {
 	keysToOmit = helpers.ensureArray(keysToOmit)
-	return _.pick(object, function(val, key)
+	return _.pickBy(object, function(val, key)
 		{
-			return !_.contains(keysToOmit, key)
+			return !_.includes(keysToOmit, key)
 		})
 },
 /*
@@ -404,9 +401,9 @@ omitObjectKeys: function(object, keysToOmit)
 collectObjectKeys: function(object, keysToKeep)
 {
 	keysToKeep = helpers.ensureArray(keysToKeep)
-	return _.pick(object, function(val, key)
+	return _.pickBy(object, function(val, key)
 		{
-			return _.contains(keysToKeep, key)
+			return _.includes(keysToKeep, key)
 		})
 },
 /*	Method: parseJSON
