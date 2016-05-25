@@ -1,7 +1,11 @@
 // Vendor Modules
 ////////////////////////
-var _ = require('lodash')
+// var _ = require('lodash')
 var expect = require('expect.js')
+
+var describe = global.describe
+var it = global.it
+
 
 describe('helpers', function() {
 
@@ -64,30 +68,6 @@ describe('helpers', function() {
 		expect(String(helpers.mergeObject({'a': 'b', 1: 2}, {'c': 'd', 2: 1, 1: 3}))).to.equal(String({'a': 'b', 1: 3, 'c': 'd', 2: 1}))
 	})
 
-	it ('should getExtension', function() {
-		expect(helpers.getExtension('mike.txt')).to.be('.txt')
-		expect(helpers.getExtension('/path/to/file.yolo')).to.be('.yolo')
-		expect(helpers.getExtension('file/with/no/extension')).to.be('')
-	})
-
-	it ('should normalizeExtension', function() {
-		expect(helpers.normalizeExtension('TXT')).to.be('.txt')
-		expect(helpers.normalizeExtension('.Fish')).to.be('.fish')
-		expect(helpers.normalizeExtension('.biddies')).to.be('.biddies')
-	})
-
-	it ('should removeExtension', function() {
-		expect(helpers.removeExtension('filepath.txt')).to.be('filepath')
-		expect(helpers.removeExtension('filepath')).to.be('filepath')
-		expect(helpers.removeExtension('/path/to/file.png')).to.be('/path/to/file')
-	})
-
-	it ('should ensureExtension', function() {
-		expect(helpers.ensureExtension('yolo.txt', '.txt')).to.be('yolo.txt')
-		expect(helpers.ensureExtension('mike', '.swag')).to.be('mike.swag')
-		expect(helpers.ensureExtension('file.txt', '.psd')).to.be('file.txt.psd')
-	})
-
 	it ('should parseCommaArray', function() {
 		expect(helpers.parseCommaArray('like, comments')).to.contain('like')
 		expect(helpers.parseCommaArray('like, comments')).to.contain('comments')
@@ -121,7 +101,7 @@ describe('helpers', function() {
 	})
 
 	it ('should omitObjectKeys', function() {
-		obj = {1: 2, 3: 4, 5: 6}
+		var obj = {1: 2, 3: 4, 5: 6}
 		expect(helpers.omitObjectKeys(obj, [1])).to.eql({3: 4, 5: 6})
 		expect(helpers.omitObjectKeys(obj, [3, 5])).to.eql({1: 2})
 		expect(helpers.omitObjectKeys(obj, 3)).to.eql({1: 2, 5: 6})
@@ -129,7 +109,7 @@ describe('helpers', function() {
 	})
 
 	it ('should collectObjectKeys', function() {
-		obj = {1: 2, 3: 4, 5: 6}
+		var obj = {1: 2, 3: 4, 5: 6}
 		expect(helpers.collectObjectKeys(obj, [1])).to.eql({1: 2})
 		expect(helpers.collectObjectKeys(obj, [3, 5])).to.eql({3: 4, 5: 6})
 		expect(helpers.collectObjectKeys(obj, 3)).to.eql({3: 4})
@@ -137,8 +117,8 @@ describe('helpers', function() {
 	})
 
 	it ('should parseJSON', function() {
-		obj = '{ "name": "Mike" }'
-		parsed = helpers.parseJSON(obj)
+		var obj = '{ "name": "Mike" }'
+		var parsed = helpers.parseJSON(obj)
 		expect(parsed.name).to.be("Mike")
 	})
 

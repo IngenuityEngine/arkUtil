@@ -66,26 +66,6 @@ class arkHelpersTest(unittest.TestCase):
 		self.assertEqual(arkHelpers.makeWebSafe('mike__1234'), 'mike__1234')
 		self.assertEqual(arkHelpers.makeWebSafe('    mike  1234^^  '), '____mike__1234____')
 
-	def test_getExtension(self):
-		self.assertEqual(arkHelpers.getExtension('mike.txt'), '.txt')
-		self.assertEqual(arkHelpers.getExtension('/path/to/file.yolo'), '.yolo')
-		self.assertEqual(arkHelpers.getExtension('path/to/file'), '')
-
-	def test_normalizeExtension(self):
-		self.assertEqual(arkHelpers.normalizeExtension('.TXT'), '.txt')
-		self.assertEqual(arkHelpers.normalizeExtension('png'), '.png')
-		self.assertEqual(arkHelpers.normalizeExtension('Yolo'), '.yolo')
-
-	def test_removeExtension(self):
-		self.assertEqual(arkHelpers.removeExtension('mike.txt'), 'mike')
-		self.assertEqual(arkHelpers.removeExtension('path/to/file.psd'), 'path/to/file')
-		self.assertEqual(arkHelpers.removeExtension('mike'), 'mike')
-
-	def test_ensureExtension(self):
-		self.assertEqual(arkHelpers.ensureExtension('Mike.txt', '.txt'), 'Mike.txt')
-		self.assertEqual(arkHelpers.ensureExtension('Mike', '.txt'), 'Mike.txt')
-		self.assertEqual(arkHelpers.ensureExtension('Mike.txt', '.mb'), 'Mike.txt.mb')
-
 	def test_parseCommaArray(self):
 		self.assertEqual(arkHelpers.parseCommaArray('Mike, is, cool'), ['Mike', 'is', 'cool'])
 		self.assertEqual(arkHelpers.parseCommaArray('like, comments'), ['like', 'comments'])

@@ -128,40 +128,6 @@ checkDone: function(remaining, callback, err)
 	}
 	return remaining
 },
-/*
-	Method: getExtensions
-
-	Returns file extension all lowercase, with no whitespace.
-*/
-getExtension: function(filename)
-{
-	if (!_.includes(filename, '.'))
-		return ''
-	return '.' + filename.split('.').pop().toLowerCase().trim()
-},
-/*
-	Method: normalizeExtension
-
-	Returns file extension all lowercase with no whitespace, preceded by a period.
-*/
-normalizeExtension: function(extension)
-{
-	extension = extension.toLowerCase().trim()
-	if (extension[0] != '.')
-		return '.' + extension
-	return extension
-},
-/*
-	Method: removeExtension
-
-	Removes extension from filename.
-*/
-removeExtension: function(filename)
-{
-	// no toLowerCase otherwise .JPG isn't removed properly
-	var ext = '.' + filename.split('.').pop().trim()
-	return filename.replace(ext, '')
-},
 removeTrailingSlash: function(url)
 {
 	// remove trailing slashes
@@ -292,18 +258,6 @@ cloneWithEmptyParents: function(elem, levels, deep)
 		.wrapWithEmptyParents(elem.clone(deep), elem, levels, deep)
 },
 
-/*
-	Method: ensureExtension
-
-	Checks that a given file has the given extension.  If not, appends the extension.
-*/
-ensureExtension: function(filename, extension)
-{
-	extension = helpers.normalizeExtension(extension)
-	if (helpers.getExtension(filename) != extension)
-		return filename + extension
-	return filename
-},
 // helper for printing comma seperated in logic-less
 // template languages
 setLastArray: function(arr)

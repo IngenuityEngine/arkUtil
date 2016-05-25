@@ -21,8 +21,6 @@ REPLACEVARS = {
 
 
 '''
-	Method:  pad
-
 	Pads a number, <num> with zeros so the resulting string is <padding> digits long.
 '''
 def pad(num,padding):
@@ -30,16 +28,12 @@ def pad(num,padding):
 	return '0'*(padding-len(num)) + num
 
 '''
-	Method: clamp
-
 	given a num, a min, and a max, ensures an output within that range.
 '''
 def clamp(num, mininum, maximum):
 	return min(max(num, mininum), maximum)
 
 '''
-	Method: varType
-
 	Returns variable type of value passed in.
 '''
 def varType(val):
@@ -85,8 +79,6 @@ def getArgs(args=None):
 	return options
 
 '''
-	Method: parseJSON
-
 	Parses given JSON if possible.  If val is a dict, return val.
 	If val is a string that can't be parsed, return None.
 	If val is not dictionary or string, return {}.
@@ -108,8 +100,6 @@ def uriReplace(v):
   return v.replace('%','%25')
 
 '''
-	Method: postString
-
 	Formats args object for a post request.
 '''
 def postString(args):
@@ -126,24 +116,18 @@ def dictToAndFrom(val):
 			invDict[v] = k
 		return dict(val.items() + invDict.items())
 '''
-	Method: mergeDict
-
 	Merges the items of two dictionaries.
 '''
 def mergeDict(a,b):
 	return dict(a.items() + b.items())
 
 '''
-	Method: movieSafeDim
-
 	Rounds number DOWN to the nearest multiple of 4.
 '''
 def movieSafeDim(dim):
 	return int(int(dim) * .25) * 4;
 
 '''
-	Method: safeFilename
-
 	Removes unsafe characters from file names.
 '''
 def safeFilename(filename):
@@ -173,16 +157,12 @@ def utcNow():
 	return int(time.time() + time.timezone)
 
 '''
-	Method: randomHash
-
 	Returns random sha224 hash of given length.  Defaults to 16.
 '''
 def randomHash(length=16):
 	return hashlib.sha224(str(random.random())).hexdigest()[:length]
 
 '''
-	Method: makeArrayUnique
-
 	Returns given array with all unique elements.
 '''
 def makeArrayUnique(val, transformFunc=None):
@@ -203,68 +183,20 @@ def makeArrayUnique(val, transformFunc=None):
 				yield x
 	return list(makeUnique(val, transformFunc))
 
-'''
-	Method: makeWebSafe
-
-	Takes a string and converts all non-alphanumeric characters to underscores.
-	Makes all characters lowercase.
-'''
 def makeWebSafe(string):
+	'''
+		Takes a string and converts all non-alphanumeric characters to underscores.
+		Makes all characters lowercase.
+	'''
 	return ''.join([i if i.isalpha() or i.isdigit() else '_' for i in string]).lower()
 
 '''
-	Method: getExtensions
-
-	Returns file extension all lowercase with no whitespace, preceded by a period.
-'''
-def getExtension(filename):
-	if '.' not in filename:
-		return ''
-	return '.' + filename.split('.')[-1].lower().strip()
-
-'''
-	Method: normalizeExtension
-
-	Returns file extension all lowercase with no whitespace, preceded by a period.
-'''
-def normalizeExtension(extension):
-	extension = extension.lower().strip()
-	if (extension[0] != '.'):
-		return '.' + extension
-	return extension
-
-'''
-	Method: removeExtension
-
-	Removes extension from filename.
-'''
-def removeExtension(filename):
-	if ('.' not in filename):
-		return filename
-	return '.'.join(filename.split('.')[:-1])
-
-'''
-	Method: ensureExtension
-
-	Checks that a given file has the given extension.  If not, appends the extension.
-'''
-def ensureExtension(filename, extension):
-	extension = normalizeExtension(extension)
-	if (getExtension(filename) != extension):
-		return filename + extension
-	return filename
-
-'''
-	Method: parseCommaArray
-
 	Turns 'likes, comments' into ['like', 'comments']
 '''
 def parseCommaArray(val):
 	return [i.strip() for i in val.split(',')]
 
 '''
-	Method: appendOrSetArray
-
 	Appends val to obj if obj is an array.
 	If obj is not, and val is not null, returns val as an array.
 	If val is null, returns [].
@@ -280,8 +212,6 @@ def appendOrSetArray(obj, val):
 	return []
 
 '''
-	Method: ensureArray
-
 	Returns val as an array.
 	If val is null, returns [].
 '''
@@ -293,8 +223,6 @@ def ensureArray(val):
 	return [val]
 
 '''
-	Method: ensureNumber
-
 	Returns float version of val if val is number or a string representing a number.
 	Otherwise returns 0.
 '''
@@ -305,8 +233,6 @@ def ensureNumber(val):
 		return 0
 
 '''
-	Method: omitObjectKeys
-
 	Given a dictionary, returns a dictionary with all entries with keys in keysToOmit omitted.
 '''
 def omitObjectKeys(d, keysToOmit):
@@ -318,8 +244,6 @@ def omitObjectKeys(d, keysToOmit):
 	return dictToReturn
 
 '''
-	Method: collectObjectKeys
-
 	Given a dictionary, returns a dictionary with all entries with keys in keysToKeep.
 '''
 def collectObjectKeys(d, keysToKeep):
@@ -331,8 +255,6 @@ def collectObjectKeys(d, keysToKeep):
 	return dictToReturn
 
 '''
-	Method: parseInt
-
 	Behaves like javascripts parseInt.  Returns 0 if not a number.
 '''
 def parseInt(val):
@@ -343,8 +265,6 @@ def parseInt(val):
   return 0
 
 '''
-	Method: capitalize
-
 	Capitalizes first character in the given string.
 '''
 def capitalize(string):
@@ -354,16 +274,12 @@ def capitalize(string):
 		return ''
 
 '''
-	Method: capitalizeWords
-
 	Capitalizes the first character in each word.
 '''
 def capitalizeWords(string):
 	return ' '.join([capitalize(w) for w in string.split(' ')])
 
 '''
-	Method: formalName
-
 	returns a capitalized version of the words
 '''
 def formalName(name):
@@ -380,8 +296,6 @@ def formalName(name):
 	return formalName
 
 '''
-	Method: parseSort
-
 	Accepts sorts in form 'field:ASC', 'field:-1', or 'field','desc'
 	Returns sort object.
 '''
@@ -399,8 +313,6 @@ def parseSort(field, order):
 	return {'field': parts[0], 'order': order, 'combined': parts[0] + ':' + order}
 
 '''
-	Method: stringCompare
-
 	Returns -1 if b > a, 1 if a > b, and 0 if a == b.
 '''
 def stringCompare(a, b):
@@ -413,8 +325,6 @@ def stringCompare(a, b):
 	return 0
 
 '''
-	Method: getAlphaNumericOnly
-
 	Removes all non-alphanumeric values from a string.
 '''
 def getAlphaNumericOnly(val):
@@ -431,16 +341,12 @@ def removeTrailingSlash(url):
 	return url
 
 '''
-	Method: getRandomInteger
-
 	A wrapper around Python's random - ensures parity with helpers.js
 '''
 def getRandomInteger(minimum, maximum):
 	return random.randint(minimum, maximum)
 
 '''
-	Method: executePython
-
 	Execute python code
 '''
 def executePython(code, context={}):
@@ -480,8 +386,6 @@ def executePython(code, context={}):
 	return result
 
 '''
-	Method: executePythonFile
-
 	Execute a python file
 '''
 def executePythonFile(scriptPath, context={}):
