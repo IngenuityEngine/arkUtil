@@ -8,9 +8,9 @@
   },
   "main": "./arkUtil/arkUtil.js",
   "dependencies": {
-    "lodash": "^2.4.1",
+    "lodash": "^4",
     "debug": "*",
-    "underscore.string": "*"
+    "underscore.string": "^3"
   },
   "bin": {},
   "keywords": [],
