@@ -1,7 +1,7 @@
 {
   "name": "arkutil",
   "description": "Common utility functions for Python and Javascript",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": {
     "name": "Grant Miller",
     "email": "blented@gmail.com"
@@ -12,10 +12,8 @@
     "debug": "*",
     "underscore.string": "*"
   },
-  "bin": {
-  },
-  "keywords": [
-  ],
+  "bin": {},
+  "keywords": [],
   "repository": {
     "type": "git",
     "url": "https://github.com/IngenuityEngine/arkUtil.git"
