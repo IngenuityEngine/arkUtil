@@ -12,6 +12,10 @@
     "debug": "*",
     "underscore.string": "^3"
   },
+  "devDependencies": {
+    "expect.js": "^0",
+    "mocha": "^2"
+  },
   "bin": {},
   "keywords": [],
   "repository": {
