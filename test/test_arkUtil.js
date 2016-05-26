@@ -12,7 +12,7 @@ describe('helpers', function() {
 	var helpers
 
 	it ('should load', function() {
-		helpers = require('../arkHelpers/arkUtil.js')
+		helpers = require('../arkUtil/arkUtil.js')
 	})
 
 	it ('should pad', function() {
@@ -25,11 +25,6 @@ describe('helpers', function() {
 		expect(helpers.varType(4)).to.be('number')
 		expect(helpers.varType({1: 2})).to.be('object')
 		expect(helpers.varType('abc')).to.be('string')
-	})
-
-	it ('should randomHash', function() {
-		expect(helpers.randomHash().length).to.be(16)
-		expect(helpers.randomHash(4).length).to.be(4)
 	})
 
 	it ('should makeArrayUnique', function() {
@@ -55,7 +50,7 @@ describe('helpers', function() {
 	it ('should makeWebSafe', function() {
 		expect(helpers.makeWebSafe('mike%is%cool')).to.be('mike_is_cool')
 		expect(helpers.makeWebSafe('website')).to.be('website')
-		expect(helpers.makeWebSafe('WEBSITE^^^IN^CAPS')).to.be('website___in_caps')
+		expect(helpers.makeWebSafe('WEBSITE^^^IN^CAPS')).to.be('website_in_caps')
 	})
 
 	it ('should postString', function() {

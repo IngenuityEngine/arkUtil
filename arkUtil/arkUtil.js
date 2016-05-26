@@ -342,9 +342,14 @@ ensureNumber: function(val)
 omitObjectKeys: function(object, keysToOmit)
 {
 	keysToOmit = helpers.ensureArray(keysToOmit)
+	// the keys need to be strings or lodash isn't in to it
+	keysToOmit = _.map(keysToOmit, function(key)
+	{
+		return String(key)
+	})
 	return _.pickBy(object, function(val, key)
 		{
-			return !_.includes(keysToOmit, key)
+			return !_.includes(keysToOmit, String(key))
 		})
 },
 /*
@@ -355,6 +360,11 @@ omitObjectKeys: function(object, keysToOmit)
 collectObjectKeys: function(object, keysToKeep)
 {
 	keysToKeep = helpers.ensureArray(keysToKeep)
+	// the keys need to be strings or lodash isn't in to it
+	keysToKeep = _.map(keysToKeep, function(key)
+	{
+		return String(key)
+	})
 	return _.pickBy(object, function(val, key)
 		{
 			return _.includes(keysToKeep, key)
@@ -661,7 +671,7 @@ joinURL: function()
 
 	Removes all non-alphanumeric characters from a string.
 */
-_notAlphaNumeric: new RegExp(/[^a-z0-9_]/g),
+_notAlphaNumeric: new RegExp(/[^a-z0-9_]/ig),
 getAlphaNumericOnly: function(val)
 {
 	return val.replace(helpers._notAlphaNumeric, '')
