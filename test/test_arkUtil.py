@@ -65,8 +65,8 @@ class test(tryout.TestSuite):
 	def test_makeWebSafe(self):
 		self.assertEqual(arkUtil.makeWebSafe('mike%is%cool'), 'mike_is_cool')
 		self.assertEqual(arkUtil.makeWebSafe('mike1234'), 'mike1234')
-		self.assertEqual(arkUtil.makeWebSafe('mike__1234'), 'mike__1234')
-		self.assertEqual(arkUtil.makeWebSafe('    mike  1234^^  '), '____mike__1234____')
+		self.assertEqual(arkUtil.makeWebSafe('mike__1234'), 'mike_1234')
+		self.assertEqual(arkUtil.makeWebSafe('    mike  1234^^  '), 'mike_1234')
 
 	def test_parseCommaArray(self):
 		self.assertEqual(arkUtil.parseCommaArray('Mike, is, cool'), ['Mike', 'is', 'cool'])

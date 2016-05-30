@@ -20,70 +20,37 @@ REPLACEVARS = {
 }
 
 
-'''
+def pad(num, padding, padChar='0'):
+	'''
 	Pads a number, <num> with zeros so the resulting string is <padding> digits long.
-'''
-def pad(num,padding):
+	'''
 	num = str(num)
-	return '0'*(padding-len(num)) + num
+	if len(num) >= padding:
+		return num
+	return padChar * (padding - len(num)) + num
 
-'''
-	given a num, a min, and a max, ensures an output within that range.
-'''
 def clamp(num, mininum, maximum):
+	'''
+	given a num, a min, and a max, ensures an output within that range.
+	'''
 	return min(max(num, mininum), maximum)
 
-'''
-	Returns variable type of value passed in.
-'''
 def varType(val):
+	'''
+	Returns variable type of value passed in.
+	'''
 	typeString = str(type(val))
-	variableType = re.search("'([a-z]+)'",typeString)
+	variableType = re.search("'([a-z]+)'", typeString)
 	if variableType:
 		return variableType.group(1)
 	return typeString
 
-# def defaultStringReplace(str):
-# 	try:
-# 		for k,v in REPLACEVARS.items():
-# 			str = str.replace(k,v)
-# 	except:
-# 		pass
-# 	return str
-
-# def defaultStringInsert(str):
-# 	try:
-# 		for k,v in REPLACEVARS.items():
-# 			str = str.replace(v,k)
-# 	except:
-# 		pass
-# 	return str
-
-def defaultStringReplace(str):
-	try:
-		for k,v in REPLACEVARS.items():
-			str = str.replace(k,v)
-	except:
-		pass
-	return str
-
-# fix: breaks on single dash arguments, improve
-def getArgs(args=None):
-	i = 1
-	if not args:
-		args = sys.argv
-	options = {'__file__':args[0]}
-	while (i < sys.argv.__len__() - 1):
-		options[args[i].replace('-','').replace(':', '')] = args[i + 1]
-		i += 2
-	return options
-
-'''
+def parseJSON(options, debug=True):
+	'''
 	Parses given JSON if possible.  If val is a dict, return val.
 	If val is a string that can't be parsed, return None.
 	If val is not dictionary or string, return {}.
-'''
-def parseJSON(options, debug=True):
+	'''
 	if not options:
 		return {}
 	if varType(options) == 'dict':
@@ -96,76 +63,51 @@ def parseJSON(options, debug=True):
 			return {}
 	return {}
 
-def uriReplace(v):
-  return v.replace('%','%25')
-
-'''
-	Formats args object for a post request.
-'''
 def postString(args):
-  data = ''
-  for k,v in args.iteritems():
-	data += '%s=%s&' % (k,uriReplace(str(v)))
-  return data[:-1]
+	'''
+	Formats args object for a post request.
+	'''
+	data = ''
+	for k,v in args.iteritems():
+		data += '%s=%s&' % (k,str(v).replace('%','%25'))
+	return data[:-1]
 
-# fix: shouldn't be using dictToAndFrom
-def dictToAndFrom(val):
-	if varType(val) == 'dict':
-		invDict = {}
-		for k,v in val.iteritems():
-			invDict[v] = k
-		return dict(val.items() + invDict.items())
-'''
-	Merges the items of two dictionaries.
-'''
 def mergeDict(a,b):
+	'''
+	Merges the items of two dictionaries.
+	'''
 	return dict(a.items() + b.items())
 
-'''
-	Rounds number DOWN to the nearest multiple of 4.
-'''
 def movieSafeDim(dim):
+	'''
+	Rounds number DOWN to the nearest multiple of 4.
+	'''
 	return int(int(dim) * .25) * 4;
 
-'''
-	Removes unsafe characters from file names.
-'''
 def safeFilename(filename):
-	"""Return a filename with only file safe characters"""
+	'''
+	Removes unsafe characters from file names.
+	'''
 	validChars = '-_.()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 	return ''.join(c for c in filename if c in validChars)
 
-'''
-	Method defaultStringInsert
 
-	Replaces a set of common SQL variables with "safe" versions
-'''
-def defaultStringInsert(str):
-	try:
-		for k,v in REPLACEVARS.items():
-			str = str.replace(v,k)
-	except:
-		pass
-	return str
-
-'''
-	Method utcNow
-
-	Returns current UTC time.
-'''
 def utcNow():
+	'''
+	Returns current UTC time.
+	'''
 	return int(time.time() + time.timezone)
 
-'''
-	Returns random sha224 hash of given length.  Defaults to 16.
-'''
 def randomHash(length=16):
+	'''
+	Returns random sha224 hash of given length.  Defaults to 16.
+	'''
 	return hashlib.sha224(str(random.random())).hexdigest()[:length]
 
-'''
-	Returns given array with all unique elements.
-'''
 def makeArrayUnique(val, transformFunc=None):
+	'''
+	Returns given array with all unique elements.
+	'''
 	def makeUnique(val, transformFunc):
 		seen = set()
 		if transformFunc is None:
@@ -183,106 +125,118 @@ def makeArrayUnique(val, transformFunc=None):
 				yield x
 	return list(makeUnique(val, transformFunc))
 
-def makeWebSafe(string):
+def makeWebSafe(val):
 	'''
-		Takes a string and converts all non-alphanumeric characters to underscores.
-		Makes all characters lowercase.
+	Takes a string and converts all non-alphanumeric characters
+	to underscores.	Makes all characters lowercase.
 	'''
-	return ''.join([i if i.isalpha() or i.isdigit() else '_' for i in string]).lower()
+	val = str(val)
+	# Everything not a letter or number becomes an underscore
+	val = re.sub('[^A-Za-z0-9]', '_', val)
+	# Consecutive underscores become one dash
+	val = re.sub('\_+', '_', val)
+	# Leading underscores go away
+	val = re.sub('^\_', '', val)
+	# Trailing underscores go away
+	val = re.sub('\_$', '', val)
+	return val.lower()
+	# return ''.join([i if i.isalpha() or i.isdigit() else '_' for i in string]).lower()
 
-'''
-	Turns 'likes, comments' into ['like', 'comments']
-'''
 def parseCommaArray(val):
+	'''
+	Turns 'likes, comments' into ['like', 'comments']
+	'''
 	return [i.strip() for i in val.split(',')]
 
-'''
+def appendOrSetArray(obj, val):
+	'''
 	Appends val to obj if obj is an array.
 	If obj is not, and val is not null, returns val as an array.
 	If val is null, returns [].
-'''
-def appendOrSetArray(obj, val):
-	if (isinstance(obj, list)):
+	'''
+	if isinstance(obj, list):
 		obj.append(val)
 		return obj
-	if (isinstance(val, list)):
+	if isinstance(val, list):
 		return val
-	if (val != None):
+	if val != None:
 		return [val]
 	return []
 
-'''
+def ensureArray(val):
+	'''
 	Returns val as an array.
 	If val is null, returns [].
-'''
-def ensureArray(val):
+	'''
 	if (isinstance(val, list)):
 		return val
 	if (val == None):
 		return []
 	return [val]
 
-'''
+# fix: should check for NaN, etc
+def ensureNumber(val):
+	'''
 	Returns float version of val if val is number or a string representing a number.
 	Otherwise returns 0.
-'''
-def ensureNumber(val):
+	'''
 	try:
 		return float(val)
 	except:
 		return 0
 
-'''
-	Given a dictionary, returns a dictionary with all entries with keys in keysToOmit omitted.
-'''
 def omitObjectKeys(d, keysToOmit):
+	'''
+	Given a dictionary, returns a dictionary with all entries with keys in keysToOmit omitted.
+	'''
 	keysToOmit = ensureArray(keysToOmit)
-	dictToReturn = {}
+	newDict = {}
 	for k, v in d.iteritems():
 		if k not in keysToOmit:
-			dictToReturn[k] = v
-	return dictToReturn
+			newDict[k] = v
+	return newDict
 
-'''
-	Given a dictionary, returns a dictionary with all entries with keys in keysToKeep.
-'''
 def collectObjectKeys(d, keysToKeep):
+	'''
+	Given a dictionary, returns a dictionary with all entries with keys in keysToKeep.
+	'''
 	keysToKeep = ensureArray(keysToKeep)
-	dictToReturn = {}
+	newDict = {}
 	for k, v in d.iteritems():
 		if k in keysToKeep:
-			dictToReturn[k] = v
-	return dictToReturn
+			newDict[k] = v
+	return newDict
 
-'''
-	Behaves like javascripts parseInt.  Returns 0 if not a number.
-'''
 def parseInt(val):
-  m = re.search(r'^(\d+)[.,]?\d*?', str(val))
-  intToReturn = int(m.groups()[-1]) if m and not callable(val) else None
-  if (intToReturn):
-  	return intToReturn
-  return 0
+	'''
+	Behaves like javascripts parseInt.
+	Returns 0 if not a number.
+	'''
+	match = re.search(r'^(\d+)[.,]?\d*?', str(val))
+	if match:
+		return int(match.groups()[-1])
+	return 0
 
-'''
-	Capitalizes first character in the given string.
-'''
 def capitalize(string):
-	if (string):
+	'''
+	Capitalizes first character in the given string.
+	'''
+	if string:
 		return string[0].upper() + string[1:]
 	else:
 		return ''
 
-'''
-	Capitalizes the first character in each word.
-'''
+# fix: implementation should match javascript
 def capitalizeWords(string):
+	'''
+	Capitalizes the first character in each word.
+	'''
 	return ' '.join([capitalize(w) for w in string.split(' ')])
 
-'''
-	returns a capitalized version of the words
-'''
 def formalName(name):
+	'''
+	returns a capitalized version of the words
+	'''
 	formalName = name
 	firstChar = name[0]
 	if (firstChar == '_'):
@@ -295,11 +249,11 @@ def formalName(name):
 
 	return formalName
 
-'''
+def parseSort(field, order):
+	'''
 	Accepts sorts in form 'field:ASC', 'field:-1', or 'field','desc'
 	Returns sort object.
-'''
-def parseSort(field, order):
+	'''
 	parts = field.split(':')
 	if len(parts) > 1:
 		order = parts[1]
@@ -310,12 +264,16 @@ def parseSort(field, order):
 		order = 'DSC'
 	else:
 		order = 'ASC'
-	return {'field': parts[0], 'order': order, 'combined': parts[0] + ':' + order}
+	return {
+		'field': parts[0],
+		'order': order,
+		'combined': parts[0] + ':' + order
+	}
 
-'''
-	Returns -1 if b > a, 1 if a > b, and 0 if a == b.
-'''
 def stringCompare(a, b):
+	'''
+	Returns -1 if b > a, 1 if a > b, and 0 if a == b.
+	'''
 	a = a.lower()
 	b = b.lower()
 	if (b > a):
@@ -324,32 +282,60 @@ def stringCompare(a, b):
 		return 1
 	return 0
 
-'''
-	Removes all non-alphanumeric values from a string.
-'''
 def getAlphaNumericOnly(val):
+	'''
+	Removes all non-alphanumeric values from a string.
+	'''
 	return ''.join([i for i in val if i.isalpha() or i.isdigit()])
 
-'''
-	Method:removeTrailingSlash
-
-	Ensures a trailing slash is omitted
-'''
 def removeTrailingSlash(url):
+	'''
+	Ensures a trailing slash is omitted
+	'''
 	if url[-1] == '/':
 		return url[:-1]
 	return url
 
-'''
+# purposefully omit random as python has a random library
+
+
+def getRandomInteger(minimum, maximum=None):
+	'''
 	A wrapper around Python's random - ensures parity with helpers.js
-'''
-def getRandomInteger(minimum, maximum):
+	'''
+	# if we skip max, just go from 0 to min
+	if maximum is None:
+		maximum = minimum
+		minimum = 0
 	return random.randint(minimum, maximum)
 
-'''
-	Execute python code
-'''
+def getRandomFloat(minimum, maximum=None):
+	'''
+	A wrapper around Python's random - ensures parity with helpers.js
+	'''
+	# if we skip max, just go from 0 to min
+	if maximum is None:
+		maximum = minimum
+		minimum = 0
+	return random.uniform(minimum, maximum)
+
+def getRandomIndex(var):
+	'''
+	Returns a random index number for a given array
+	'''
+	return getRandomInteger(len(var))
+
+def getRandomIndexValue(var):
+	'''
+	Returns a random index value for a given array
+	'''
+	return var[getRandomIndex(var)]
+
+
 def executePython(code, context={}):
+	'''
+	Execute python code
+	'''
 	# fix syntax error if last line is a comment with no new line
 	if not code.endswith('\n'):
 		code = code + '\n'
@@ -385,10 +371,10 @@ def executePython(code, context={}):
 	sys.stdout = oldStdOut
 	return result
 
-'''
-	Execute a python file
-'''
 def executePythonFile(scriptPath, context={}):
+	'''
+	Execute a python file
+	'''
 	try:
 		with open(scriptPath) as f:
 			code = f.read()
