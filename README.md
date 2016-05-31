@@ -14,6 +14,7 @@ To Do:
 - serverTest > serverOnly - more generic
 - utcTime > utcNow - clearer
 - createHash > randomHash - in line w/ python
+- joinURL > joinUrl - just feels right ya dig?
 
 ### Moved
 - getExtension - duplicated in cOS, belongs there
@@ -30,3 +31,16 @@ To Do:
 - uriReplace - only used w/in arkUtil once
 - dictToAndFrom - antipattern
 - callbackError - unused, makes no sense
+- removeClass - moved to UI
+- addClass - moved to UI
+- getCSS - moved to UI
+- copyCSS - moved to UI
+- cloneWithCSS - moved to UI
+- wrapWithEmptyParents - moved to UI
+- cloneWithEmptyParents - moved to UI
+- setLastArray - moved to UI
+- stopBubble - moved to UI
+- isJQuery - moved to UI
+- isJQueryEvent - moved to UI
+- setDataAndAttribute - moved to UI
+- removeDataAndAttribute - moved to UI

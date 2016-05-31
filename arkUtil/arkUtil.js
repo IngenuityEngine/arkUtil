@@ -459,6 +459,82 @@ getRandomIndexValue: function(arr)
 	return arr[helpers.getRandomIndex(arr)]
 },
 
+// purposefully skip executePython
+
+// purposefully skip executePythonFile
+
+// collect all the matches in a string for a given
+// regex object note: /g flag must be set
+// on RegExp(regex, 'g') or /regex/g
+collectRegexMatches: function(str, regex)
+{
+	var matches = []
+	var match
+	do {
+		match = regex.exec(str)
+		if (match !== null)
+			matches.push(match)
+	}
+	while (match !== null)
+	return matches
+},
+replaceAll: function(str, find, replace)
+{
+	return str.replace(new RegExp(find, 'g'), replace)
+},
+defaultFor: function(variable, defaultValue)
+{
+	if (variable === undefined)
+		return defaultValue
+	return variable
+},
+moveArrayItem: function(arr, from, to)
+{
+	if (from < 0)
+		from = arr.length + from
+	var element = arr[from]
+	arr.splice(from, 1)
+	arr.splice(to, 0, element)
+	return arr
+},
+
+isError: function(obj)
+{
+	return obj instanceof Error
+},
+
+isSubset: function(test, all)
+{
+	var subset = true
+	_.each(test, function(val)
+	{
+		subset = subset && _.includes(all, val)
+	})
+	return subset
+},
+
+/*
+	Method: joinURL
+
+	Combines all string arguments to function.
+*/
+joinUrl: function()
+{
+	if (arguments.length < 2)
+		return arguments
+	var combined = ''
+	_.each(arguments, function(url)
+	{
+		if (combined.length &&
+			combined.slice(-1) != '/')
+			combined += '/'
+		if (url[0] == '/')
+			url = url.slice(1)
+		combined += url
+	})
+	return combined
+},
+
 // fix: should be able to make these generic
 // and just do clientOnly but arguments magic variable
 // doesn't seem to work reliably with tests
@@ -479,74 +555,11 @@ serverOnly: function(func, context)
 	}
 },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// collect all the matches in a string for a given
-// regex object note: /g flag must be set
-// on RegExp(regex, 'g') or /regex/g
-collectRegexMatches: function(str, regex)
-{
-	var matches = []
-	var match
-	do {
-		match = regex.exec(str)
-		if (match !== null)
-			matches.push(match)
-	}
-	while (match !== null)
-	return matches
-},
-isSubset: function(test, all)
-{
-	return test.length === _.intersection(test, all).length
-},
-defaultFor: function(variable, defaultValue)
-{
-	if (variable === undefined)
-		return defaultValue
-	return variable
-},
-
-moveArrayItem: function(arr, from, to)
-{
-	if (from < 0)
-		from = arr.length + from
-	var element = arr[from]
-	arr.splice(from, 1)
-	arr.splice(to, 0, element)
-	return arr
-},
-
-isError: function(obj)
-{
-	return obj instanceof Error
-},
-
 parseQueryString: function(queryString)
 {
 	// lob off the '?' at the head
 	queryString = queryString.substring( queryString.indexOf('?') + 1 )
+
 	var params = {}
 	var queryParts = decodeURI(queryString).split(/&/g)
 	_.each(queryParts, function(val)
@@ -562,42 +575,6 @@ parseQueryString: function(queryString)
 		})
 	return params
 },
-
-replaceAll: function(str, find, replace)
-{
-	return str.replace(new RegExp(find, 'g'), replace)
-},
-
-/*
-	Method: joinURL
-
-	Combines all string arguments to function.
-*/
-// fix: check for starting and trailing slashes
-joinURL: function()
-{
-	if (arguments.length < 2)
-		return arguments
-	var combined = ''
-	_.each(arguments, function(url)
-	{
-		if (_.isString(url))
-			combined += url
-	})
-	return combined
-},
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
 	Method: getGlobal
@@ -624,202 +601,6 @@ setGlobal: function(key, val)
 	else if (!_.isUndefined(window))
 		window[key] = val
 },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// stuff that should be in coren.ui
-
-
-
-
-
-// Method: removeClass
-// Removes a class from a space-seprated class list
-removeClass: function(classes, classToRemove)
-{
-	if (!classes)
-		return ''
-	var newClasses = _.without(classes.split(' '), classToRemove)
-	if (!newClasses.length)
-		return ''
-	else if (newClasses.length == 1)
-		return newClasses[0]
-	return newClasses.join(' ')
-},
-// Method: addClass
-// Adds a class to a space-seprated class list
-addClass: function(spaceList, item)
-{
-	// if there's no existing list
-	// just return the item to add
-	if (!spaceList || !spaceList.length)
-	{
-		return item || ''
-	}
-	// if there's nothing to add,
-	// just return the original list
-	if (!item || !item.length)
-		return spaceList
-	return spaceList + ' ' + item
-},
-
-// Method: getCSS
-// Gets the full css for a given jquery element
-getCSS: function(elem)
-{
-	var sheets = document.styleSheets
-	var cssObject = {}
-	var r
-
-	function CSSToJSON(css)
-	{
-		var s = {}
-		var i
-		if (!css) return s
-		if (typeof css == 'string')
-		{
-			css = css.split(' ')
-			for (i in css)
-			{
-				var l = css[i].split(': ')
-				s[l[0].toLowerCase()] = (l[1])
-			}
-		}
-		else
-		{
-			for (i in css)
-			{
-				if ((css[i]).toLowerCase)
-				{
-					s[(css[i]).toLowerCase()] = (css[css[i]])
-				}
-			}
-		}
-		return s
-	}
-
-	for (var i in sheets)
-	{
-		var rules = sheets[i].rules || sheets[i].cssRules
-		for (r in rules)
-		{
-			if (elem.is(rules[r].selectorText))
-			{
-				cssObject = _.extend(cssObject, CSSToJSON(rules[r].style), CSSToJSON(elem.attr('style')))
-			}
-		}
-	}
-	return cssObject
-},
-
-copyCSS: function(clone, original)
-{
-	var children
-	for (var i = 0; i < original.length; i += 1)
-	{
-		clone.eq(i).css(helpers.getCSS(original.eq(i)))
-		children = clone.eq(i).children()
-		if (children.length)
-			helpers.copyCSS(children, original.eq(i).children())
-	}
-},
-// Method: cloneWithCSS
-// Clone a jquery element with all it's css
-cloneWithCSS: function(elem, deep)
-{
-	var clone = elem.clone(deep)
-	helpers.copyCSS(clone, elem)
-	return clone
-},
-
-// Method: wrapWithEmptyParents
-// Wrap a jquery element with it's emptied parents
-// typically for the purpose of keeping CSS styles
-wrapWithEmptyParents: function(elem, parentSource, levelsToWrap, deep)
-{
-	var wrapper = parentSource.parent()
-	_.each(_.range(levelsToWrap), function()
-	{
-		elem.wrap(wrapper.clone(deep).empty())
-		elem = elem.parent()
-		wrapper = wrapper.parent()
-	})
-	return elem
-},
-
-// Method: cloneWithEmptyParents
-// Clone a jquery element with it's emptied parents
-// typically for the purpose of keeping CSS styles
-cloneWithEmptyParents: function(elem, levels, deep)
-{
-	return helpers
-		.wrapWithEmptyParents(elem.clone(deep), elem, levels, deep)
-},
-
-// helper for printing comma seperated in logic-less
-// template languages
-setLastArray: function(arr)
-{
-	if (_.isObject(arr[arr.length-1]) &&
-		!_.has(arr[arr.length-1], 'last'))
-		arr[arr.length-1].last = true
-	return arr
-},
-// stop an event from bubbling up
-stopBubble: function(e)
-{
-	if (!e)
-		e = window.event
-	//IE9 & Other Browsers
-	if (e.stopPropagation)
-		e.stopPropagation()
-	//IE8 and Lower
-	else
-		e.cancelBubble = true
-},
-isJQuery: function(obj)
-{
-	if (!helpers.jQuery)
-		return false
-	return obj instanceof helpers.jQuery
-},
-isJQueryEvent: function(obj)
-{
-	if (!helpers.jQuery)
-		return false
-	return obj instanceof helpers.jQuery.Event
-},
-
-setDataAndAttribute: function(elem, key, val)
-{
-	elem.data(key, val).attr('data-' + key, val)
-},
-removeDataAndAttribute: function(elem, key)
-{
-	elem.removeData(key).attr('data-' + key)
-},
-
-
-
-// Methods
-/////////////////////////
-
-
-
-
-
-
 
 // end of module
 }

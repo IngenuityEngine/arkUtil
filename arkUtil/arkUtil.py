@@ -389,3 +389,37 @@ def executePythonFile(scriptPath, context={}):
 	# append the dirname to path so we can require files like normal
 	sys.path.append(os.path.dirname(scriptPath))
 	return executePython(code, context)
+
+
+def collectRegexMatches(string, regex):
+	return re.findall(regex, string)
+
+def replaceAll(string, find, replace):
+	return re.sub(find, replace, string)
+
+def defaultFor(var, defaultValue):
+	if var is None:
+		return defaultValue
+	return var
+
+# fix: missing moveArrayItem
+# def moveArrayItem(arr, from, to):
+
+def isError(var):
+	return isinstance(var, Exception)
+
+def isSubset(test, allItems):
+	subset = True
+	for item in test:
+		subset = subset and item in allItems
+	return subset
+
+def joinUrl(*args):
+	combined = ''
+	for url in args:
+		if len(combined) and combined[-1] != '/':
+			combined += '/'
+		if url[0] == '/':
+			url = url[1:]
+		combined += url
+	return combined

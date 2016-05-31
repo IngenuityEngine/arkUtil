@@ -148,8 +148,8 @@ describe('helpers', function() {
 	})
 
 	it ('should joinURL', function() {
-		expect(helpers.joinURL('url1', 'url2')).to.be('url1url2')
-		expect(helpers.joinURL('url1', 54, 'url2')).to.be('url1url2')
+		expect(helpers.joinUrl('url1', 'url2')).to.be('url1/url2')
+		expect(helpers.joinUrl('url1', 54, 'url2')).to.be('url1/54/url2')
 	})
 
 	it ('should getAlphaNumericOnly', function() {
