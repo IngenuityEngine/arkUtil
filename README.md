@@ -5,7 +5,7 @@ Common utility functions for Python and Javascript
 To Do:
 - [ ] move javascript ui stuff to coren.ui
 - [ ] better test coverage
-
+- [ ] move unicodeToString from cOS to here
 
 
 ## Refactor Changes
