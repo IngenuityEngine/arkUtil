@@ -132,10 +132,10 @@ class test(tryout.TestSuite):
 		self.assertEqual(arkUtil.getAlphaNumericOnly('mike__123'), 'mike123')
 		self.assertEqual(arkUtil.getAlphaNumericOnly('^$%@^#'), '')
 
-	def collectRegexMatches(self):
-		self.assertEqual(arkUtil.collectRegexMatches('sup yea sup', 'sup'), ['sup', 'sup'])
-		self.assertEqual(arkUtil.collectRegexMatches('word homey yea', 'sup'), [])
-		self.assertEqual(arkUtil.collectRegexMatches('1-2-3-4-5', '-[0-9]'), ['-2','-3','-4','-5'])
+	def getRegexMatches(self):
+		self.assertEqual(arkUtil.getRegexMatches('sup yea sup', 'sup'), ['sup', 'sup'])
+		self.assertEqual(arkUtil.getRegexMatches('word homey yea', 'sup'), [])
+		self.assertEqual(arkUtil.getRegexMatches('1-2-3-4-5', '-[0-9]'), ['-2','-3','-4','-5'])
 
 	def replaceAll(self):
 		self.assertEqual(arkUtil.replaceAll('sup yea sup', 'sup', 'b'), 'b yea b')

@@ -466,7 +466,7 @@ getRandomIndexValue: function(arr)
 // collect all the matches in a string for a given
 // regex object note: /g flag must be set
 // on RegExp(regex, 'g') or /regex/g
-collectRegexMatches: function(str, regex)
+getRegexMatches: function(str, regex)
 {
 	var matches = []
 	var match

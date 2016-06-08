@@ -391,7 +391,7 @@ def executePythonFile(scriptPath, context={}):
 	return executePython(code, context)
 
 
-def collectRegexMatches(string, regex):
+def getRegexMatches(string, regex):
 	return re.findall(regex, string)
 
 def replaceAll(string, find, replace):
