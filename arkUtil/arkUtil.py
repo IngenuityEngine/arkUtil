@@ -40,9 +40,9 @@ def varType(val):
 	Returns variable type of value passed in.
 	'''
 	typeString = str(type(val))
-	variableType = re.search("'([a-z]+)'", typeString)
-	if variableType:
-		return variableType.group(1)
+	matches = re.findall("'([a-zA-Z_]+)'", typeString)
+	if len(matches):
+		return matches[0]
 	return typeString
 
 def parseJSON(options, debug=True):
