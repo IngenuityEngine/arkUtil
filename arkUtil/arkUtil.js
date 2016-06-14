@@ -535,6 +535,14 @@ joinUrl: function()
 	return combined
 },
 
+// Skipped unicodeToString, not needed in javascript
+
+
+
+
+// Javascript only
+//////////////////////////////////////////////////
+
 // fix: should be able to make these generic
 // and just do clientOnly but arguments magic variable
 // doesn't seem to work reliably with tests

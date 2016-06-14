@@ -1,4 +1,5 @@
 
+# Standard modules
 import os
 import sys
 import re
@@ -6,7 +7,7 @@ import time
 import random
 import hashlib
 import json
-# import math
+import types
 from StringIO import StringIO
 import traceback
 
@@ -45,7 +46,7 @@ def varType(val):
 		return matches[0]
 	return typeString
 
-def parseJSON(options, debug=True):
+def parseJSON(options, ignoreErrors=False):
 	'''
 	Parses given JSON if possible.  If val is a dict, return val.
 	If val is a string that can't be parsed, return None.
@@ -55,11 +56,13 @@ def parseJSON(options, debug=True):
 		return {}
 	if varType(options) == 'dict':
 		return options
-	elif varType(options) == 'string':
+	elif varType(options) == 'str':
 		try:
-			return json.loads(options)
+			parsed = json.loads(options)
+			return unicodeToString(parsed)
 		except:
-			if debug: raise Exception('Failed to load options: ' + options)
+			if not ignoreErrors:
+				raise Exception('Failed to load options: ' + options)
 			return {}
 	return {}
 
@@ -423,3 +426,20 @@ def joinUrl(*args):
 			url = url[1:]
 		combined += url
 	return combined
+
+def unicodeToString(data):
+	'''
+	Replaces unicode with a regular string
+	for a variety of data types
+	'''
+	inputType = type(data)
+	if isinstance(data, types.StringTypes):
+		return str(data)
+	elif inputType == types.ListType:
+		return [unicodeToString(x) for x in data]
+	elif inputType == types.DictType:
+		# fix: uncomment in Sublime 3
+		# return {unicodeToString(x): unicodeToString(data[x]) for x in data}
+		return dict([(unicodeToString(x), unicodeToString(data[x])) for x in data])
+	else:
+		return data
