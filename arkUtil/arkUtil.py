@@ -6,7 +6,7 @@ import re
 import time
 import random
 import hashlib
-import json
+import commentjson
 import types
 from StringIO import StringIO
 import traceback
@@ -58,7 +58,7 @@ def parseJSON(options, ignoreErrors=False):
 		return options
 	elif varType(options) == 'str':
 		try:
-			parsed = json.loads(options)
+			parsed = commentjson.load(options)
 			return unicodeToString(parsed)
 		except:
 			if not ignoreErrors:
