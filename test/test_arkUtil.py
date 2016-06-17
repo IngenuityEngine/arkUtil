@@ -1,18 +1,9 @@
 
-import os
-import sys
+import arkInit
+arkInit.init()
 
-sys.path.insert(0,
-	os.path.abspath(
-		os.path.join(
-			os.path.dirname(os.path.realpath(__file__)),
-			'..')
-		)
-	)
-import arkUtil
-
-sys.path.append('c:/ie/tryout')
 import tryout
+import arkUtil
 
 
 class test(tryout.TestSuite):
