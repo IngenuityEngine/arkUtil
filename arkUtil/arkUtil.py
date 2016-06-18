@@ -14,12 +14,6 @@ import traceback
 # only need to do this once
 random.seed(time.time())
 
-REPLACEVARS = {
-'#37;':'%',
-'#38;':'&',
-'#92;':'\\'
-}
-
 
 def pad(num, padding, padChar='0'):
 	'''
@@ -58,11 +52,20 @@ def parseJSON(options, ignoreErrors=False):
 		return options
 	elif varType(options) == 'str':
 		try:
+			parsed = commentjson.loads(options)
+			return unicodeToString(parsed)
+		except Exception as err:
+			if not ignoreErrors:
+				print 'Failed to load options: ' + str(options)
+				raise err
+	elif varType(options) == 'file':
+		try:
 			parsed = commentjson.load(options)
 			return unicodeToString(parsed)
-		except:
+		except Exception as err:
 			if not ignoreErrors:
-				raise Exception('Failed to load options: ' + options)
+				print 'Failed to load options: ' + str(options)
+				raise err
 			return {}
 	return {}
 
@@ -75,11 +78,22 @@ def postString(args):
 		data += '%s=%s&' % (k,str(v).replace('%','%25'))
 	return data[:-1]
 
-def mergeDict(a,b):
+def mergeDict(source, destination):
 	'''
 	Merges the items of two dictionaries.
 	'''
-	return dict(a.items() + b.items())
+	# return dict(a.items() + b.items())
+
+	for key, value in source.items():
+		if isinstance(value, dict):
+			# get node or create one
+			node = destination.setdefault(key, {})
+			mergeDict(value, node)
+		else:
+			destination[key] = value
+
+	return destination
+
 
 def movieSafeDim(dim):
 	'''

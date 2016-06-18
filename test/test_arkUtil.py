@@ -29,7 +29,15 @@ class test(tryout.TestSuite):
 		self.assertEqual(arkUtil.postString({'tea': 'pot', 'cat' : 'dog', 'wow': 'amaze'}), 'tea=pot&wow=amaze&cat=dog')
 
 	def mergeDict(self):
-		self.assertEqual(arkUtil.mergeDict({'a': 'b', 'c': 'd'} , {'e': 'f'}), {'a': 'b', 'c': 'd', 'e': 'f'})
+		a = {'a': 'b', 'c': 'd'}
+		b = {'e': 'f'}
+		c = {'e': {'f':'g'}}
+		d = {'e': {'h':'i'}}
+		resultAB = {'a': 'b', 'c': 'd', 'e': 'f'}
+		resultCD = {'e': {'f': 'g', 'h': 'i'}}
+		self.assertEqual(arkUtil.mergeDict(a, b), resultAB)
+		self.assertEqual(arkUtil.mergeDict(c, d), resultCD)
+		self.assertEqual(arkUtil.mergeDict({1: 2}, {}), {1: 2})
 		self.assertEqual(arkUtil.mergeDict({1: 2}, {}), {1: 2})
 
 	def movieSafeDim(self):
