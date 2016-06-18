@@ -26,17 +26,27 @@ class test(tryout.TestSuite):
 	# 	self.assertEqual(parsed[0], 'Foo')
 
 	def postStrings(self):
-		self.assertEqual(arkUtil.postString({'tea': 'pot', 'cat' : 'dog', 'wow': 'amaze'}), 'tea=pot&wow=amaze&cat=dog')
+		self.assertEqual(arkUtil.postString(
+			{'tea': 'pot', 'cat' : 'dog', 'wow': 'amaze'}),
+			'tea=pot&wow=amaze&cat=dog')
 
 	def mergeDict(self):
 		a = {'a': 'b', 'c': 'd'}
 		b = {'e': 'f'}
 		c = {'e': {'f':'g'}}
 		d = {'e': {'h':'i'}}
+		e = {'e': 12}
+		f = {'e': 14}
+		g = {'e': [12, 11, 10]}
+		h = {'e': [14, 8]}
 		resultAB = {'a': 'b', 'c': 'd', 'e': 'f'}
 		resultCD = {'e': {'f': 'g', 'h': 'i'}}
+		resultEF = {'e': 14}
+		resultGH = {'e': [14, 8, 12, 11, 10]}
 		self.assertEqual(arkUtil.mergeDict(a, b), resultAB)
 		self.assertEqual(arkUtil.mergeDict(c, d), resultCD)
+		self.assertEqual(arkUtil.mergeDict(e, f), resultEF)
+		self.assertEqual(arkUtil.mergeDict(g, h), resultGH)
 		self.assertEqual(arkUtil.mergeDict({1: 2}, {}), {1: 2})
 		self.assertEqual(arkUtil.mergeDict({1: 2}, {}), {1: 2})
 

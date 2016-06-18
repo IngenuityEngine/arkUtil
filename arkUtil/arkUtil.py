@@ -83,16 +83,22 @@ def mergeDict(source, destination):
 	Merges the items of two dictionaries.
 	'''
 	# return dict(a.items() + b.items())
-
-	for key, value in source.items():
-		if isinstance(value, dict):
+	for key, value in destination.items():
+		if type(value) == dict:
 			# get node or create one
-			node = destination.setdefault(key, {})
-			mergeDict(value, node)
+			node = source.setdefault(key, {})
+			mergeDict(node, value)
+		# fix: better list merging
+		elif type(value) == list:
+			node = source.setdefault(key, [])
+			if type(node) == list:
+				source[key] = value + node
+			else:
+				source[key] = value
 		else:
-			destination[key] = value
+			source[key] = value
 
-	return destination
+	return source
 
 
 def movieSafeDim(dim):
