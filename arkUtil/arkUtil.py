@@ -56,7 +56,6 @@ def parseJSON(options, ignoreErrors=False):
 			return unicodeToString(parsed)
 		except Exception as err:
 			if not ignoreErrors:
-				print 'Failed to load options: ' + str(options)
 				raise err
 	elif varType(options) == 'file':
 		try:
@@ -64,7 +63,6 @@ def parseJSON(options, ignoreErrors=False):
 			return unicodeToString(parsed)
 		except Exception as err:
 			if not ignoreErrors:
-				print 'Failed to load options: ' + str(options)
 				raise err
 			return {}
 	return {}
