@@ -89,12 +89,12 @@ def mergeDict(source, destination):
 			node = source.setdefault(key, {})
 			mergeDict(node, value)
 		# fix: better list merging
-		elif type(value) == list:
-			node = source.setdefault(key, [])
-			if type(node) == list:
-				source[key] = value + node
-			else:
-				source[key] = value
+		# elif type(value) == list:
+		# 	node = source.setdefault(key, [])
+		# 	if type(node) == list:
+		# 		source[key] = value + node
+		# 	else:
+		# 		source[key] = value
 		else:
 			source[key] = value
 
