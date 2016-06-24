@@ -15,6 +15,11 @@ describe('helpers', function() {
 		helpers = require('../arkUtil/arkUtil.js')
 	})
 
+	it ('isServer and isClient', function() {
+		expect(helpers.isServer).to.be(true)
+		expect(helpers.isClient).to.be(false)
+	})
+
 	it ('should pad', function() {
 		expect(helpers.pad(42, 4)).to.be('0042')
 		expect(helpers.pad(5, 6)).to.be('000005')
