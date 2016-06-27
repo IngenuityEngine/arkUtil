@@ -14,8 +14,8 @@ debug = debug('helpers')
 // Constants
 /////////////////////////
 var seed = 156
-var clientTest = (typeof process != 'undefined' && process.env.isClient) ||
-					(typeof window != 'undefined' && window.document)
+var isClient = typeof window != 'undefined' && window.document
+
 var notAlphaNumeric = new RegExp(/[^a-z0-9_]/ig)
 
 // Main
@@ -24,8 +24,8 @@ var helpers = module.exports = {
 
 // Variables
 /////////////////////////
-isClient: clientTest,
-isServer: !clientTest,
+isClient: isClient,
+isServer: !isClient,
 
 // Methods
 /////////////////////////
