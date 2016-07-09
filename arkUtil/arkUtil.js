@@ -15,6 +15,8 @@ debug = debug('helpers')
 /////////////////////////
 var seed = 156
 var notAlphaNumeric = new RegExp(/[^a-z0-9_]/ig)
+var validIP = new RegExp(/^(([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)\.){3}([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)$/)
+var localIP = new RegExp(/(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/)
 
 // Main
 /////////////////////////
@@ -610,7 +612,34 @@ setGlobal: function(key, val)
 		window[key] = val
 },
 
+/*
+	Method: isValidIP
+
+	Tests if an IP is a valid local IP
+*/
+isValidIP: function(ip)
+{
+	// split off ipv6 for now
+	ip = ip.split(':').slice(-1)
+	return validIP.test(ip)
+},
+/*
+	Method: isLocalIP
+
+	Tests if an IP is a valid local IP
+*/
+isLocalIP: function(ip)
+{
+	if (!helpers.isValidIP(ip))
+		return false
+
+	// split off ipv6 for now
+	ip = ip.split(':').slice(-1)
+	return localIP.test(ip)
+},
+
 // end of module
 }
 
 helpers.jQuery = helpers.getGlobal('jQuery')
+

@@ -163,4 +163,22 @@ describe('helpers', function() {
 		expect(helpers.getAlphaNumericOnly('***Mike Wow***  ')).to.be('MikeWow')
 	})
 
+	it ('should verify valid ips', function() {
+		expect(helpers.isValidIP('::ffff:127.0.0.1')).to.be(true)
+		expect(helpers.isValidIP('127.0.0.1')).to.be(true)
+		expect(helpers.isValidIP('192.168.0.12')).to.be(true)
+		expect(helpers.isValidIP('107.168.0.12')).to.be(true)
+		expect(helpers.isValidIP('18.168.0.12')).to.be(true)
+		expect(helpers.isValidIP('::ffff:10.168.0.12')).to.be(true)
+	})
+
+	it ('should verify local ips', function() {
+		expect(helpers.isLocalIP('::ffff:127.0.0.1')).to.be(true)
+		expect(helpers.isLocalIP('127.0.0.1')).to.be(true)
+		expect(helpers.isLocalIP('192.168.0.12')).to.be(true)
+		expect(helpers.isLocalIP('107.168.0.12')).to.be(false)
+		expect(helpers.isLocalIP('18.168.0.12')).to.be(false)
+		expect(helpers.isLocalIP('::ffff:10.168.0.12')).to.be(true)
+	})
+
 })
