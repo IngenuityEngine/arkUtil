@@ -161,7 +161,6 @@ def makeWebSafe(val):
 	# Trailing underscores go away
 	val = re.sub('\_$', '', val)
 	return val.lower()
-	# return ''.join([i if i.isalpha() or i.isdigit() else '_' for i in string]).lower()
 
 def parseCommaArray(val):
 	'''
