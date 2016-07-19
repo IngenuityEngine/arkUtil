@@ -83,6 +83,36 @@ class test(tryout.TestSuite):
 		self.assertEqual(arkUtil.parseCommaArray('like, comments'), ['like', 'comments'])
 		self.assertEqual(arkUtil.parseCommaArray('        wow    ,       amaze      '), ['wow', 'amaze'])
 
+	def parseFrameRange(self):
+		parsed = arkUtil.parseFrameRange('1-10')
+		print parsed
+		self.assertEqual(len(parsed), 10)
+		self.assertIn(1, parsed)
+		self.assertIn(10, parsed)
+
+		parsed = arkUtil.parseFrameRange('1-3,5,12')
+		print parsed
+		self.assertEqual(len(parsed), 5)
+		self.assertTrue(1 in parsed)
+		self.assertTrue(4 not in parsed)
+		self.assertTrue(5 in parsed)
+		self.assertTrue(12 in parsed)
+
+		parsed = arkUtil.parseFrameRange('12')
+		print parsed
+		self.assertEqual(len(parsed), 1)
+		self.assertTrue(12 in parsed)
+
+		parsed = arkUtil.parseFrameRange(12)
+		print parsed
+		self.assertEqual(len(parsed), 1)
+		self.assertTrue(12 in parsed)
+
+		parsed = arkUtil.parseFrameRange(12.1)
+		print parsed
+		self.assertEqual(len(parsed), 1)
+		self.assertTrue(12 in parsed)
+
 	def appendOrSetArray(self):
 		self.assertEqual(arkUtil.appendOrSetArray([1,2,3], 4), [1,2,3,4])
 		self.assertEqual(arkUtil.appendOrSetArray(1, [1,2,3]), [1,2,3])

@@ -168,6 +168,34 @@ def parseCommaArray(val):
 	'''
 	return [i.strip() for i in val.split(',')]
 
+def parseFrameRange(frameRanges):
+	'''
+	Turns '1-3,5' into [1,2,3,5]
+	'''
+
+	if not frameRanges:
+		return []
+	elif type(frameRanges) is float:
+		return [int(frameRanges)]
+	elif type(frameRanges) is int:
+		return [frameRanges]
+
+	frameRanges = frameRanges.split(',')
+	frames = []
+	for frameRange in frameRanges:
+		parts = frameRange.split('-')
+		if len(parts) == 2:
+			start = parseInt(parts[0])
+			end = parseInt(parts[1])
+			if end > start:
+				frames += range(start, end + 1)
+		elif len(parts) == 1:
+			frames.append(parseInt(parts[0]))
+
+	frames = makeArrayUnique(frames)
+	frames.sort()
+	return frames
+
 def appendOrSetArray(obj, val):
 	'''
 	Appends val to obj if obj is an array.
