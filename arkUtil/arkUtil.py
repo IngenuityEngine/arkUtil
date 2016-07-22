@@ -180,6 +180,7 @@ def parseFrameRange(frameRanges):
 	elif type(frameRanges) is int:
 		return [frameRanges]
 
+	frameRanges = frameRanges.replace(' ', '')
 	frameRanges = frameRanges.split(',')
 	frames = []
 	for frameRange in frameRanges:
