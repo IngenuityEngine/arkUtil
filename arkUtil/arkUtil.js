@@ -208,6 +208,39 @@ parseCommaArray: function(val)
 		})
 },
 /*
+	Method: parseFrameRange
+
+	Turns '1-3,5' into [1,2,3,5]
+*/
+parseFrameRange: function(frameRanges)
+{
+	if (!frameRanges)
+		return []
+	else if (_.isNumber(frameRanges))
+		return [helpers.parseInt(frameRanges)]
+
+	frameRanges = frameRanges.split(',')
+	var frames = []
+	var parts, start, end
+	_.each(frameRanges, function(frameRange)
+	{
+		parts = frameRange.split('-')
+		if (parts.length == 2)
+		{
+			start = helpers.parseInt(parts[0])
+			end = helpers.parseInt(parts[1])
+			if (end > start)
+				frames = frames.concat(_.range(start, end + 1))
+		}
+		else if (parts.length == 1)
+		{
+			frames.push(helpers.parseInt(parts[0]))
+		}
+	})
+
+	return _.sortBy(helpers.makeArrayUnique(frames))
+},
+/*
 	Method: appendOrSetArray
 
 	Appends val to obj if obj is an array.
