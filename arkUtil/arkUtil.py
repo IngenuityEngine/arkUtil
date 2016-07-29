@@ -160,7 +160,7 @@ def makeWebSafe(val):
 	val = re.sub('^\_', '', val)
 	# Trailing underscores go away
 	val = re.sub('\_$', '', val)
-	return val.lower()
+	return val
 
 def parseCommaArray(val):
 	'''
