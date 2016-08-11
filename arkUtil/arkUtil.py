@@ -171,6 +171,7 @@ def parseCommaArray(val):
 def parseFrameRange(frameRanges):
 	'''
 	Turns '1-3,5' into [1,2,3,5]
+	Turns '12-11' into [11, 12]
 	'''
 
 	if not frameRanges:
@@ -190,6 +191,8 @@ def parseFrameRange(frameRanges):
 			end = parseInt(parts[1])
 			if end > start:
 				frames += range(start, end + 1)
+			else:
+				frames += range(end, start + 1)
 		elif len(parts) == 1:
 			frames.append(parseInt(parts[0]))
 
