@@ -211,6 +211,7 @@ parseCommaArray: function(val)
 	Method: parseFrameRange
 
 	Turns '1-3,5' into [1,2,3,5]
+	Turns '12-11' into [11, 12]
 */
 parseFrameRange: function(frameRanges)
 {
@@ -231,6 +232,8 @@ parseFrameRange: function(frameRanges)
 			end = helpers.parseInt(parts[1])
 			if (end > start)
 				frames = frames.concat(_.range(start, end + 1))
+			else
+				frames = frames.concat(_.range(end, start + 1))
 		}
 		else if (parts.length == 1)
 		{
