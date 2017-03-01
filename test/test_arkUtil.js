@@ -106,6 +106,11 @@ describe('arkUtil', function() {
 		console.log(parsed)
 		expect(parsed.length).to.be(1)
 		expect(parsed).to.contain(12)
+
+		parsed = arkUtil.parseFrameRange('1001-1001')
+		console.log(parsed)
+		expect(parsed.length).to.be(1)
+		expect(parsed).to.contain(1001)
 	})
 
 	it ('should appendOrSetArray', function() {
