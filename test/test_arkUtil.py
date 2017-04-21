@@ -113,6 +113,11 @@ class test(tryout.TestSuite):
 		self.assertEqual(len(parsed), 1)
 		self.assertTrue(12 in parsed)
 
+		parsed = arkUtil.parseFrameRange('1001-1001')
+		print parsed
+		self.assertEqual(len(parsed), 1)
+		self.assertTrue(1001 in parsed)
+
 	def appendOrSetArray(self):
 		self.assertEqual(arkUtil.appendOrSetArray([1,2,3], 4), [1,2,3,4])
 		self.assertEqual(arkUtil.appendOrSetArray(1, [1,2,3]), [1,2,3])
