@@ -68,6 +68,9 @@ def parseJSON(options, ignoreErrors=False):
 	return {}
 
 def splitFrameRangeByChunk(frameRange, numChunks):
+	'''
+	Splits single frame range dict into a list of frameRange dicts
+	'''
 	numFrames = frameRange['endFrame'] - frameRange['startFrame'] + 1
 	framesPerThread = int(numFrames / numChunks)
 
@@ -80,8 +83,8 @@ def splitFrameRangeByChunk(frameRange, numChunks):
 		if i == numChunks - 1:
 			endFrame = frameRange['endFrame']
 
-		frameRangeString = str(startFrame) + '-' + str(endFrame)
-		frameRangeChunks.append(frameRangeString)
+		frameRangeDict = {'startFrame': startFrame, 'endFrame': endFrame}
+		frameRangeChunks.append(frameRangeDict)
 		startFrame = endFrame + 1
 
 	return frameRangeChunks
