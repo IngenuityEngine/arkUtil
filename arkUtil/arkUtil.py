@@ -67,6 +67,25 @@ def parseJSON(options, ignoreErrors=False):
 			return {}
 	return {}
 
+def splitFrameRangeByChunk(frameRange, numChunks):
+	numFrames = frameRange['endFrame'] - frameRange['startFrame'] + 1
+	framesPerThread = int(numFrames / numChunks)
+
+	frameRangeChunks = []
+	startFrame = frameRange['startFrame']
+
+	for i in range(numChunks):
+		endFrame = startFrame + framesPerThread - 1
+
+		if i == numChunks - 1:
+			endFrame = frameRange['endFrame']
+
+		frameRangeString = str(startFrame) + '-' + str(endFrame)
+		frameRangeChunks.append(frameRangeString)
+		startFrame = endFrame + 1
+
+	return frameRangeChunks
+
 def postString(args):
 	'''
 	Formats args object for a post request.
