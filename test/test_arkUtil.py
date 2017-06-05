@@ -208,5 +208,10 @@ class test(tryout.TestSuite):
 		self.assertEqual(arkUtil.joinUrl('this/','sweet'),'this/sweet')
 		self.assertEqual(arkUtil.joinUrl('this/','/sweet/','stuff'),'this/sweet/stuff')
 
+	def splitFrameRangeByChunk(self):
+		print arkUtil.splitFrameRangeByChunk({'startFrame': 1001, 'endFrame': 1100}, 4)
+		print arkUtil.splitFrameRangeByChunk({'startFrame': 1001, 'endFrame': 1105}, 4)
+		print arkUtil.splitFrameRangeByChunk({'startFrame': 1001, 'endFrame': 1095}, 4)
+
 if __name__ == '__main__':
 	tryout.run(test)
