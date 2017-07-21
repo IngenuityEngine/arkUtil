@@ -14,6 +14,11 @@ import traceback
 # only need to do this once
 random.seed(time.time())
 
+def sort(data):
+	convert_lambda = lambda text: int(text) if text.isdigit() else text
+	natural_sort_lambda = lambda text: [convert_lambda(text_fragment) for text_fragment in
+			 re.split("([0-9]+)", text)]
+	return sorted(data, key=natural_sort_lambda)
 
 def pad(num, padding, padChar='0'):
 	'''
