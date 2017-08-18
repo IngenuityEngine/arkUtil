@@ -72,6 +72,7 @@ def parseJSON(options, ignoreErrors=False):
 			return {}
 	return {}
 
+# To Do: trash this to use cOS getPadding soon!
 def getPadding(filepath):
 	hashReg = re.compile('##+')
 	dollarReg = re.compile('\$F[1-9]')
@@ -547,5 +548,6 @@ def unicodeToString(data):
 
 
 # print getPadding('%04d')
-# print getPadding('$F4')
+# print getPadding('.$F.')
+# print getPadding('.1.')
 # print getPadding('#####')
