@@ -94,9 +94,9 @@ def getPadding(filepath):
 		padding = paddingReg.search(framePadding).group()
 
 	elif frameNumberReg.search(filepath):
-		framePadding = frameReg.search(filepath).group()
-		padding = len(framePadding)
-		if len <= 2:
+		framePadding = frameNumberReg.search(filepath).group()
+		padding = len(framePadding) - 2
+		if padding <= 2:
 			return 0
 
 	else:
@@ -557,5 +557,6 @@ def unicodeToString(data):
 
 
 # print getPadding('%04d')
-# print getPadding('$F4')
+# print getPadding('.$F.')
+print getPadding('.1.')
 # print getPadding('#####')
