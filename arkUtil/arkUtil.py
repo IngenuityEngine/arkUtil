@@ -549,5 +549,5 @@ def unicodeToString(data):
 
 # print getPadding('%04d')
 # print getPadding('.$F.')
-print getPadding('.1.')
+# print getPadding('.1.')
 # print getPadding('#####')
