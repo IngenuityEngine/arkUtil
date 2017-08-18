@@ -75,9 +75,8 @@ def parseJSON(options, ignoreErrors=False):
 # To Do: trash this to use cOS getPadding soon!
 def getPadding(filepath):
 	hashReg = re.compile('##+')
-	dollarReg = re.compile('\$F[1-9]?')
+	dollarReg = re.compile('\$F[1-9]')
 	frameReg = re.compile('%[0-9]{1,2}d')
-	frameNumberReg = re.compile('\.[0-9]+\.')
 
 	if hashReg.search(filepath):
 		framePadding = hashReg.search(filepath).group()
@@ -91,10 +90,6 @@ def getPadding(filepath):
 		framePadding = frameReg.search(filepath).group()
 		paddingReg = re.compile('[0-9]{1,2}')
 		padding = paddingReg.search(framePadding).group()
-
-	elif frameNumberReg.search(filepath):
-		framePadding = frameNumberReg.search(filepath).group()
-		padding = len(framePadding) - 2
 
 	else:
 		raise Exception('Does not contain valid frame text')
