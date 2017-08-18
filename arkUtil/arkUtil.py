@@ -74,8 +74,9 @@ def parseJSON(options, ignoreErrors=False):
 
 def getPadding(filepath):
 	hashReg = re.compile('##+')
-	dollarReg = re.compile('\$F[1-9]')
+	dollarReg = re.compile('\$F[1-9]?')
 	frameReg = re.compile('%[0-9]{1,2}d')
+	frameNumberReg = re.compile('\.[0-9]+\.')
 
 	if hashReg.search(filepath):
 		framePadding = hashReg.search(filepath).group()
@@ -84,14 +85,23 @@ def getPadding(filepath):
 	elif dollarReg.search(filepath):
 		framePadding = dollarReg.search(filepath).group()
 		padding = framePadding[-1]
+		if padding == 'F':
+			return 0
 
 	elif frameReg.search(filepath):
 		framePadding = frameReg.search(filepath).group()
 		paddingReg = re.compile('[0-9]{1,2}')
 		padding = paddingReg.search(framePadding).group()
 
+	elif frameNumberReg.search(filepath):
+		framePadding = frameReg.search(filepath).group()
+		padding = len(framePadding)
+		if len <= 2:
+			return 0
+
 	else:
-		raise Exception('Does not contain valid frame text')
+		print 'Does not contain valid frame text'
+		return 0
 
 	return int(padding)
 
