@@ -72,30 +72,6 @@ def parseJSON(options, ignoreErrors=False):
 			return {}
 	return {}
 
-# To Do: trash this to use cOS getPadding soon!
-def getPadding(filepath):
-	hashReg = re.compile('##+')
-	dollarReg = re.compile('\$F[1-9]')
-	frameReg = re.compile('%[0-9]{1,2}d')
-
-	if hashReg.search(filepath):
-		framePadding = hashReg.search(filepath).group()
-		padding = framePadding.count('#')
-
-	elif dollarReg.search(filepath):
-		framePadding = dollarReg.search(filepath).group()
-		padding = framePadding[-1]
-
-	elif frameReg.search(filepath):
-		framePadding = frameReg.search(filepath).group()
-		paddingReg = re.compile('[0-9]{1,2}')
-		padding = paddingReg.search(framePadding).group()
-
-	else:
-		raise Exception('Does not contain valid frame text')
-
-	return int(padding)
-
 def splitFrameRangeByChunk(frameRange, numChunks):
 	'''
 	Splits single frame range dict into a list of frameRange dicts
