@@ -272,6 +272,8 @@ def ensureArray(val):
 	'''
 	if (isinstance(val, list)):
 		return val
+	if isinstance(val, tuple) or isinstance(val, set):
+		return list(val)
 	if (val == None):
 		return []
 	return [val]
