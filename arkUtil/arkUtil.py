@@ -234,21 +234,24 @@ def parseFrameRange(frameRanges):
 	frameRanges = frameRanges.replace(' ', '')
 	frameRanges = frameRanges.split(',')
 	frames = []
-	for frameRange in frameRanges:
-		parts = frameRange.split('-')
-		if len(parts) == 2:
-			start = parseInt(parts[0])
-			end = parseInt(parts[1])
-			if end > start:
-				frames += range(start, end + 1)
-			else:
-				frames += range(end, start + 1)
-		elif len(parts) == 1:
-			frames.append(parseInt(parts[0]))
+	try:
+		for frameRange in frameRanges:
+			parts = frameRange.split('-')
+			if len(parts) == 2:
+				start = int(parts[0])
+				end = int(parts[1])
+				if end > start:
+					frames += range(start, end + 1)
+				else:
+					frames += range(end, start + 1)
+			elif len(parts) == 1:
+				frames.append(int(parts[0]))
 
-	frames = makeArrayUnique(frames)
-	frames.sort()
-	return frames
+		frames = makeArrayUnique(frames)
+		frames.sort()
+		return frames
+	except Exception:
+		return []
 
 def appendOrSetArray(obj, val):
 	'''
