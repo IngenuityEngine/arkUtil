@@ -4,6 +4,7 @@ import os
 import sys
 import re
 import time
+import datetime
 import random
 import hashlib
 import commentjson
@@ -521,6 +522,92 @@ def unicodeToString(data):
 		return dict([(unicodeToString(x), unicodeToString(data[x])) for x in data])
 	else:
 		return data
+
+# expand takes in a string and replaces patterns like {dd}
+# with information.
+# specialFunction allows a specific class to augment stringTemplate's
+# functionality with class-specific replacment possibilities. See server/scripts/osOperations realPath
+# method for a case of this in practice.
+def expand(template, replacements={}):
+
+	bracketedComponents = getRegexMatches(template, '{.*?\}')
+
+	if not len(bracketedComponents):
+		return template
+
+	string = template
+	for component in bracketedComponents:
+		replacement = component[1:-1]
+		if replacement.upper() in ['DD', 'MM', 'YY', 'YYYY']:
+			replacement = getDateComponent(replacement)
+		elif replacement in replacements:
+			replacement = replacements[replacement]
+		else:
+			# otherwise keep bracketed components the same
+			continue
+
+		string = string.replace(component, replacement)
+
+	return string
+
+def getDateComponent(pattern):
+	def datePad(dateComponent):
+		return pad(dateComponent, 2)
+
+	date = datetime.datetime.now()
+	pattern = pattern.upper()
+
+	if pattern == 'DD':
+		return datePad(date.day)
+	elif pattern == 'MM':
+		return datePad(date.month)
+	elif pattern == 'YY':
+		return datePad(date.year % 100)
+	elif pattern == 'YYYY':
+		return str(date.year)
+
+# formats a template to be used as a regex:
+# adds capture groups around brackets
+# surrounds characters around pipes with brackets, ie. [A|a] (case-insensitive options)
+# escapes periods
+# assumes template will start at beginning and end at end
+def regexFromTemplate(template):
+	if not template:
+		raise ValueError('template undefined')
+	regex = template
+	regex = re.sub('\.', '\.', regex)
+	regex = re.sub('\{[\w\d%_-]*\}', '([\w\d%_-]*)', regex)
+	regex = '^' + regex + '$'
+	return regex
+
+# given a template with brackets, parses a string by extracting portions that match template
+# returns as data dict
+# '{a}and{b}', '1234and5' -> {a: '1234', b: '5'}
+def parse(template, str):
+	if not template:
+		return {}
+
+	fields = re.findall('\{([\w\d%_-]*)\}', template)
+	regex = regexFromTemplate(template)
+
+	parsed = re.match(regex, str)
+	if not parsed:
+		raise ValueError('could not parse string ' + str + ' with template ' + template)
+	parsed = parsed.groups()
+	data = dict(zip(fields, parsed))
+	return data
+
+def matchesData(template, data):
+	if not template:
+		raise ValueError('template undefined')
+	fields = re.findall('\{([\w\d%_-]*)\}', template)
+	return all([k in data.keys() for k in fields])
+
+# needs to match to the end of the text ({asdf}/ won't match test/etc)
+def matchesText(template, str):
+	if not template:
+		raise ValueError('template undefined')
+	return bool(re.match(regexFromTemplate(template), str))
 
 
 # print getPadding('%04d')

@@ -209,9 +209,62 @@ class test(tryout.TestSuite):
 		self.assertEqual(arkUtil.joinUrl('this/','/sweet/','stuff'),'this/sweet/stuff')
 
 	def splitFrameRangeByChunk(self):
-		print arkUtil.splitFrameRangeByChunk({'startFrame': 1001, 'endFrame': 1100}, 4)
-		print arkUtil.splitFrameRangeByChunk({'startFrame': 1001, 'endFrame': 1105}, 4)
-		print arkUtil.splitFrameRangeByChunk({'startFrame': 1001, 'endFrame': 1095}, 4)
+		self.assertEqual(arkUtil.splitFrameRangeByChunk({'startFrame': 1001, 'endFrame': 1100}, 4),
+			[{'startFrame': 1001, 'endFrame': 1025},
+			 {'startFrame': 1026, 'endFrame': 1050},
+			 {'startFrame': 1051, 'endFrame': 1075},
+			 {'startFrame': 1076, 'endFrame': 1100}])
+		self.assertEqual(arkUtil.splitFrameRangeByChunk({'startFrame': 1001, 'endFrame': 1105}, 4),
+			[{'startFrame': 1001, 'endFrame': 1026},
+			 {'startFrame': 1027, 'endFrame': 1052},
+			 {'startFrame': 1053, 'endFrame': 1078},
+			 {'startFrame': 1079, 'endFrame': 1105}])
+		self.assertEqual(arkUtil.splitFrameRangeByChunk({'startFrame': 1001, 'endFrame': 1095}, 4),
+			[{'startFrame': 1001, 'endFrame': 1023},
+			 {'startFrame': 1024, 'endFrame': 1046},
+			 {'startFrame': 1047, 'endFrame': 1069},
+			 {'startFrame': 1070, 'endFrame': 1095}])
+
+	def expand(self):
+		self.assertEqual(arkUtil.expand('{root}/{path}/{to}/{file}.{ext}', {'root':'.', 'path': 'a', 'to': 'b', 'file': 'c', 'ext': 'd'}),
+			'./a/b/c.d')
+		self.assertEqual(arkUtil.expand('{this}/{is}/{partial}', {'this':'expand'}), 'expand/{is}/{partial}')
+		self.assertEqual(arkUtil.expand('{this}/{is}/{partial}', {'this':'expand', 'partial': 'still true'}), 'expand/{is}/still true')
+		self.assertEqual(arkUtil.expand('', {'a':'b'}), '')
+
+	def regexFromTemplate(self):
+		self.assertEqual(arkUtil.regexFromTemplate('{start}.to.{end}'), '^([\w\d%_-]*)\.to\.([\w\d%_-]*)$')
+		self.assertEqual(arkUtil.regexFromTemplate('/{start}/to/{end}'), '^/([\w\d%_-]*)/to/([\w\d%_-]*)$')
+		self.assertEqual(arkUtil.regexFromTemplate('{root}/{path}/{to}/{file}.{ext}'), '^([\w\d%_-]*)/([\w\d%_-]*)/([\w\d%_-]*)/([\w\d%_-]*)\.([\w\d%_-]*)$')
+
+	def parse(self):
+		self.assertEqual(arkUtil.parse('{start}/middle/{end}', 'a/middle/z'), {'start': 'a', 'end': 'z'})
+		self.assertEqual(arkUtil.parse('{this}', 'works'), {'this': 'works'})
+		self.assertEqual(arkUtil.parse('{root}/Publish/{asdf}', 'path/Publish/asdf'), {'root': 'path', 'asdf': 'asdf'})
+
+		self.assertError(lambda: arkUtil.parse('{a}/b/{c}', 'a/a/b/c'))
+		self.assertError(lambda: arkUtil.parse('{a}/b/{c}', 'a/a/b/'))
+		self.assertError(lambda: arkUtil.parse('{a}/b/{c}', 'a/b$/c'))
+
+	def matchesData(self):
+		_renderPathAbsoluteShort = '/ramburglar/{project}/Workspaces/{sequence}/{shot}/R|renders/{versionName}/'
+
+		self.assertTrue(arkUtil.matchesData(_renderPathAbsoluteShort, {'project': 'a', 'sequence': 'b', 'shot': 'c', 'versionName': 'd'}))
+		self.assertFalse(arkUtil.matchesData(_renderPathAbsoluteShort, {'project': 'a', 'shot': 'c', 'versionName': 'd'}))
+		self.assertTrue(arkUtil.matchesData(_renderPathAbsoluteShort, {'project': 'a', 'sequence': 'b', 'shot': 'c', 'versionName': 'd', 'extra': 'e'}))
+		self.assertFalse(arkUtil.matchesData('{this}/{is}/{partial}', {'this':'expand'}))
+
+	def matchesText(self):
+		_sourcePath = 'r:/{project}/Workspaces/{sequence}/{shot}/{assetType}/'
+		_filename = '{assetName}_{assetType}_{versionPadding}_{initials}.{extension}'
+		path = 'r:/Aeroplane/Workspaces/AER_Video/AER_Airplane_010/Scene/AER_Airplane_020_scene_v004_asd.mb'
+		path2 = 'r:/Aeroplane/Workspaces/AER_Video/AER_Airplane_010/Scene/'
+
+		self.assertTrue(arkUtil.matchesText(_sourcePath, path2))
+		self.assertFalse(arkUtil.matchesText(_sourcePath, path))
+		self.assertTrue(arkUtil.matchesText(_sourcePath + _filename, path))
+		self.assertFalse(arkUtil.matchesText(_sourcePath + _filename, path2))
+
 
 if __name__ == '__main__':
 	tryout.run(test)
