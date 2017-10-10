@@ -202,7 +202,7 @@ def parseFrameRange(frameRanges):
 	Turns '12-11' into [11, 12]
 	'''
 
-	if not frameRanges and not frameRanges == 0:
+	if not frameRanges:
 		return []
 	elif type(frameRanges) is float:
 		return [int(frameRanges)]
