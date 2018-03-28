@@ -182,7 +182,7 @@ def makeWebSafe(val):
 	val = str(val)
 	# Everything not a letter or number becomes an underscore
 	val = re.sub('[^A-Za-z0-9]', '_', val)
-	# Consecutive underscores become one dash
+	# Consecutive underscores become one underscore
 	val = re.sub('\_+', '_', val)
 	# Leading underscores go away
 	val = re.sub('^\_', '', val)
